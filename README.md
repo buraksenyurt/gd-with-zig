@@ -13,6 +13,7 @@ Game development practices with Zig programming language and [Raylib](https://gi
 | **Game Name**      | **Description**                      | **Zig Version**      |
 |--------------------|--------------------------------------|----------------------|
 | Space Invaders     | Classic Space Invaders game remake   | 0.15.1               |
+| Blocks             | Memory matching blocks game          | 0.15.1               |
 
 ## Setup
 

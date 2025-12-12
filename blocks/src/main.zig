@@ -1,25 +1,29 @@
 const rl = @import("raylib");
 
-const MAX_BLOCKS: usize = 16 * 12;
-const ROW_BLOCKS: usize = 16;
-const COL_BLOCKS: usize = 12;
-const BLOCK_WIDTH: i32 = 50;
-const BLOCK_HEIGHT: i32 = 50;
+const MAX_BLOCKS: usize = 8 * 6;
+const ROW_BLOCKS: usize = 8;
+const COL_BLOCKS: usize = 6;
+const BLOCK_WIDTH: i32 = 100;
+const BLOCK_HEIGHT: i32 = 100;
 pub fn main() !void {
-    var game = Game.init();
+    var game = Game{};
     game.loadBlocks();
     var blockPairIndex: usize = 0;
 
-    rl.initWindow(800, 800, "Blocks Game in Zig with Raylib");
+    rl.initWindow(800, 740, "Blocks Game in Zig with Raylib");
     defer rl.closeWindow();
 
     rl.setTargetFPS(60);
+    const ferris = try rl.loadTexture("resources/ferris_00.png");
+    defer rl.unloadTexture(ferris);
 
     while (!rl.windowShouldClose()) {
         rl.beginDrawing();
         defer rl.endDrawing();
 
         rl.clearBackground(rl.Color.black);
+
+        rl.drawTexture(ferris, 10, 610, rl.Color.white);
 
         if (rl.isMouseButtonPressed(rl.MouseButton.left)) {
             if (game.playerAttempts == game.totalGuess) {
@@ -132,22 +136,14 @@ fn getRandomColor() rl.Color {
 }
 
 const Game = struct {
-    totalBlocks: usize,
-    totalAttempts: usize,
-    playerAttempts: usize,
+    totalBlocks: usize = MAX_BLOCKS,
+    totalAttempts: usize = 0,
+    playerAttempts: usize = 0,
     foundPairs: bool = false,
     blockPair: [2]Block = undefined,
     blocks: [MAX_BLOCKS]Block = undefined,
     totalGuess: usize = 2,
-
-    pub fn init() @This() {
-        return .{
-            .totalBlocks = MAX_BLOCKS,
-            .totalAttempts = 0,
-            .playerAttempts = 0,
-            .foundPairs = false,
-        };
-    }
+    totalPairCount: usize = 0,
 
     pub fn loadBlocks(self: *@This()) void {
         var index: u32 = 0;
@@ -166,25 +162,34 @@ const Game = struct {
                 index += 1;
             }
         }
+        self.calculateTotalPairs();
+    }
+
+    fn calculateTotalPairs(self: *@This()) void {
+        //todo@buraksenyurt Find unique colors and calculate pairs count accordingly
+
+        self.totalPairCount = MAX_BLOCKS / 2;
     }
 
     pub fn draw(self: @This()) void {
-        const scoreText = rl.textFormat("Blocks: %d   Attempts: %d Current Attempts: %d", .{
+        const xPos = 150;
+        const scoreText = rl.textFormat("Blocks:    %d(Pairs: %d)   Attempts: %d    Player Attempt: %d", .{
             self.totalBlocks,
+            self.totalPairCount,
             self.totalAttempts,
             self.playerAttempts,
         });
-        rl.drawText(scoreText, 10, 610, 20, rl.Color.white);
+        rl.drawText(scoreText, xPos, 620, 20, rl.Color.white);
         if (self.foundPairs) {
-            rl.drawText("Last pair was a match!", 10, 640, 20, rl.Color.green);
+            rl.drawText("Last pair was a match!", xPos, 650, 20, rl.Color.green);
         } else {
-            rl.drawText("Last pair was not a match.", 10, 640, 20, rl.Color.red);
+            rl.drawText("Last pair was not a match.", xPos, 650, 20, rl.Color.red);
         }
         const color1 = self.blockPair[0].realColor;
         const color2 = self.blockPair[1].realColor;
         const rColorText = rl.textFormat("Color 1 %d,%d,%d,%d", .{ color1.r, color1.g, color1.b, color1.a });
         const lColorText = rl.textFormat("Color 2 %d,%d,%d,%d", .{ color2.r, color2.g, color2.b, color2.a });
-        rl.drawText(rColorText, 10, 670, 20, rl.Color.white);
-        rl.drawText(lColorText, 10, 690, 20, rl.Color.white);
+        rl.drawText(rColorText, xPos, 680, 20, rl.Color.white);
+        rl.drawText(lColorText, xPos, 700, 20, rl.Color.white);
     }
 };
