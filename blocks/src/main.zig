@@ -1,23 +1,14 @@
 const rl = @import("raylib");
+
+const MAX_BLOCKS: usize = 16 * 12;
+const ROW_BLOCKS: usize = 16;
+const COL_BLOCKS: usize = 12;
+const BLOCK_WIDTH: i32 = 50;
+const BLOCK_HEIGHT: i32 = 50;
 pub fn main() !void {
-    const blockSize = .{ 16, 12 };
-    const totalBlocks = blockSize[0] * blockSize[1];
     var game = Game.init();
-    game.totalBlocks = totalBlocks;
-    const totalGuess: usize = 2;
-    var blocks: [totalBlocks]Block = undefined;
-    var index: u32 = 0;
-
+    game.loadBlocks();
     var blockPairIndex: usize = 0;
-
-    for (0..blockSize[0]) |i| {
-        for (0..blockSize[1]) |j| {
-            const x = @as(i32, @intCast(i));
-            const y = @as(i32, @intCast(j));
-            blocks[index] = Block.init(index, x * 50, y * 50, 48, 48, rl.Color.blue);
-            index += 1;
-        }
-    }
 
     rl.initWindow(800, 800, "Blocks Game in Zig with Raylib");
     defer rl.closeWindow();
@@ -31,16 +22,27 @@ pub fn main() !void {
         rl.clearBackground(rl.Color.black);
 
         if (rl.isMouseButtonPressed(rl.MouseButton.left)) {
-            if (game.playerAttempts == totalGuess) {
-                if (isColorEqual(game.blockPair[0].realColor, game.blockPair[1].realColor)) {
+            if (game.playerAttempts == game.totalGuess) {
+                if (game.blocks[game.blockPair[0].id].x == game.blocks[game.blockPair[1].id].x and
+                    game.blocks[game.blockPair[0].id].y == game.blocks[game.blockPair[1].id].y)
+                {
+                    // Same block clicked twice, ignore
+                    game.playerAttempts = 1;
+                    game.blockPair[1] = undefined;
+                    blockPairIndex = 1;
+                    continue;
+                }
+
+                if (game.blockPair[0].eqColor(game.blockPair[1])) {
                     game.foundPairs = true;
-                    blocks[game.blockPair[0].id].isActive = false;
-                    blocks[game.blockPair[1].id].isActive = false;
+                    game.totalBlocks -= 2;
+                    game.blocks[game.blockPair[0].id].isActive = false;
+                    game.blocks[game.blockPair[1].id].isActive = false;
                 } else {
                     game.foundPairs = false;
                 }
-                blocks[game.blockPair[0].id].inRealColorMode = false;
-                blocks[game.blockPair[1].id].inRealColorMode = false;
+                game.blocks[game.blockPair[0].id].inRealColorMode = false;
+                game.blocks[game.blockPair[1].id].inRealColorMode = false;
                 blockPairIndex = 0;
                 game.playerAttempts = 0;
                 game.blockPair[0] = undefined;
@@ -49,8 +51,9 @@ pub fn main() !void {
                 const mouseX = rl.getMouseX();
                 const mouseY = rl.getMouseY();
 
-                for (0..blocks.len) |i| {
-                    var block = &blocks[i];
+                for (0..game.blocks.len) |i| {
+                    var block = &game.blocks[i];
+
                     if (mouseX >= block.x and mouseX <= block.x + block.width and
                         mouseY >= block.y and mouseY <= block.y + block.height)
                     {
@@ -64,7 +67,7 @@ pub fn main() !void {
             }
         }
 
-        for (blocks) |block| {
+        for (game.blocks) |block| {
             block.draw();
         }
 
@@ -94,6 +97,10 @@ const Block = struct {
             .coverColor = color,
             .realColor = realColor,
         };
+    }
+
+    pub fn eqColor(self: @This(), other: @This()) bool {
+        return self.realColor.r == other.realColor.r and self.realColor.g == other.realColor.g and self.realColor.b == other.realColor.b and self.realColor.a == other.realColor.a;
     }
 
     pub fn draw(self: @This()) void {
@@ -130,9 +137,35 @@ const Game = struct {
     playerAttempts: usize,
     foundPairs: bool = false,
     blockPair: [2]Block = undefined,
+    blocks: [MAX_BLOCKS]Block = undefined,
+    totalGuess: usize = 2,
 
     pub fn init() @This() {
-        return .{ .totalBlocks = 0, .totalAttempts = 0, .playerAttempts = 0, .foundPairs = false };
+        return .{
+            .totalBlocks = MAX_BLOCKS,
+            .totalAttempts = 0,
+            .playerAttempts = 0,
+            .foundPairs = false,
+        };
+    }
+
+    pub fn loadBlocks(self: *@This()) void {
+        var index: u32 = 0;
+        for (0..ROW_BLOCKS) |i| {
+            for (0..COL_BLOCKS) |j| {
+                const x = @as(i32, @intCast(i));
+                const y = @as(i32, @intCast(j));
+                self.blocks[index] = Block.init(
+                    index,
+                    x * BLOCK_WIDTH,
+                    y * BLOCK_HEIGHT,
+                    BLOCK_WIDTH - 2,
+                    BLOCK_HEIGHT - 2,
+                    rl.Color.blue,
+                );
+                index += 1;
+            }
+        }
     }
 
     pub fn draw(self: @This()) void {
@@ -141,21 +174,17 @@ const Game = struct {
             self.totalAttempts,
             self.playerAttempts,
         });
-        rl.drawText(scoreText, 10, 600, 20, rl.Color.white);
+        rl.drawText(scoreText, 10, 610, 20, rl.Color.white);
         if (self.foundPairs) {
-            rl.drawText("Last pair was a match!", 10, 620, 20, rl.Color.green);
+            rl.drawText("Last pair was a match!", 10, 640, 20, rl.Color.green);
         } else {
-            rl.drawText("Last pair was not a match.", 10, 620, 20, rl.Color.red);
+            rl.drawText("Last pair was not a match.", 10, 640, 20, rl.Color.red);
         }
         const color1 = self.blockPair[0].realColor;
         const color2 = self.blockPair[1].realColor;
         const rColorText = rl.textFormat("Color 1 %d,%d,%d,%d", .{ color1.r, color1.g, color1.b, color1.a });
         const lColorText = rl.textFormat("Color 2 %d,%d,%d,%d", .{ color2.r, color2.g, color2.b, color2.a });
-        rl.drawText(rColorText, 10, 650, 20, rl.Color.white);
-        rl.drawText(lColorText, 10, 670, 20, rl.Color.white);
+        rl.drawText(rColorText, 10, 670, 20, rl.Color.white);
+        rl.drawText(lColorText, 10, 690, 20, rl.Color.white);
     }
 };
-
-fn isColorEqual(color1: rl.Color, color2: rl.Color) bool {
-    return color1.r == color2.r and color1.g == color2.g and color1.b == color2.b and color1.a == color2.a;
-}
