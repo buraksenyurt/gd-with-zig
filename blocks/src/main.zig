@@ -39,8 +39,8 @@ pub fn main() !void {
                 } else {
                     game.foundPairs = false;
                 }
-                game.blockPair[0].inRealColorMode = false;
-                game.blockPair[1].inRealColorMode = false;
+                blocks[game.blockPair[0].id].inRealColorMode = false;
+                blocks[game.blockPair[1].id].inRealColorMode = false;
                 blockPairIndex = 0;
                 game.playerAttempts = 0;
                 game.blockPair[0] = undefined;
