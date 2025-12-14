@@ -4,16 +4,24 @@ const rl = @import("raylib");
 const std = @import("std");
 const colorUtils = @import("color.zig").ColorUtils;
 
+pub const GameState = enum {
+    Initial,
+    Playing,
+    Won,
+};
+
 pub const Game = struct {
     totalBlocks: usize = config.MAX_BLOCKS,
     totalAttempts: usize = 0,
     playerAttempts: usize = 0,
     foundPairs: bool = false,
     blockPair: [2]Block = undefined,
+    blockPairIndex: usize = 0,
     blocks: [config.MAX_BLOCKS]Block = undefined,
     totalGuess: usize = 2,
     totalPairCount: usize = 0,
-    blockPairIndex: usize = 0,
+    foundedBlocksCount: usize = 0,
+    state: GameState = GameState.Initial,
 
     pub fn init(self: *@This()) void {
         var index: u32 = 0;
@@ -33,6 +41,7 @@ pub const Game = struct {
             }
         }
         self.calculateTotalPairs();
+        self.state = GameState.Playing;
     }
 
     fn calculateTotalPairs(self: *@This()) void {
@@ -53,6 +62,15 @@ pub const Game = struct {
     }
 
     pub fn Update(self: *@This()) void {
+        if (self.foundedBlocksCount == self.totalPairCount * 2) {
+            std.log.info("MISSION COMPLETED", .{});
+            rl.drawText("MISSION COMPLETED", 300, 350, 40, rl.Color.green);
+            self.state = GameState.Won;
+            return;
+        }
+
+        self.state = GameState.Playing;
+
         if (rl.isMouseButtonPressed(rl.MouseButton.left)) {
             if (self.playerAttempts == self.totalGuess) {
                 if (self.blocks[self.blockPair[0].id].x == self.blocks[self.blockPair[1].id].x and
@@ -67,6 +85,7 @@ pub const Game = struct {
                 if (self.blockPair[0].eqColor(self.blockPair[1])) {
                     self.foundPairs = true;
                     self.totalBlocks -= 2;
+                    self.foundedBlocksCount += 2;
                     self.blocks[self.blockPair[0].id].isActive = false;
                     self.blocks[self.blockPair[1].id].isActive = false;
                 } else {

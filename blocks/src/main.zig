@@ -25,13 +25,29 @@ pub fn main() !void {
         rl.clearBackground(rl.Color.black);
 
         rl.drawTexture(ferris, 10, 610, rl.Color.white);
+        switch (game.state) {
+            .Initial => {
+                rl.drawText("Click to Start the Game", 250, 350, 40, rl.Color.yellow);
+                if (rl.isMouseButtonPressed(rl.MouseButton.left)) {
+                    game.init();
+                }
+            },
+            .Playing => {
+                game.Update();
 
-        game.Update();
+                for (game.blocks) |block| {
+                    block.draw();
+                }
 
-        for (game.blocks) |block| {
-            block.draw();
+                game.draw();
+            },
+            .Won => {
+                rl.drawText("You Won! Click to Restart", 200, 350, 40, rl.Color.green);
+                if (rl.isMouseButtonPressed(rl.MouseButton.left)) {
+                    game = Game{};
+                    game.init();
+                }
+            },
         }
-
-        game.draw();
     }
 }
