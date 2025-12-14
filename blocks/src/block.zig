@@ -36,6 +36,8 @@ pub const Block = struct {
 
         if (self.inRealColorMode) {
             rl.drawRectangle(self.x, self.y, self.width, self.height, self.realColor);
+            const idText = rl.textFormat("%d", .{self.id});
+            rl.drawText(idText, self.x + @as(i32, @divExact(self.width, 2)) - 15, self.y + @as(i32, @divExact(self.height, 2)) - 20, 30, rl.Color.black);
             return;
         }
 
