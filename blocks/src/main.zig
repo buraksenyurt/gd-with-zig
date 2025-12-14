@@ -1,4 +1,5 @@
 const rl = @import("raylib");
+const std = @import("std");
 
 const MAX_BLOCKS: usize = 8 * 6;
 const ROW_BLOCKS: usize = 8;
@@ -6,6 +7,8 @@ const COL_BLOCKS: usize = 6;
 const BLOCK_WIDTH: i32 = 100;
 const BLOCK_HEIGHT: i32 = 100;
 pub fn main() !void {
+    rl.setRandomSeed(@intCast(std.time.timestamp()));
+
     var game = Game{};
     game.loadBlocks();
     var blockPairIndex: usize = 0;
@@ -30,7 +33,6 @@ pub fn main() !void {
                 if (game.blocks[game.blockPair[0].id].x == game.blocks[game.blockPair[1].id].x and
                     game.blocks[game.blockPair[0].id].y == game.blocks[game.blockPair[1].id].y)
                 {
-                    // Same block clicked twice, ignore
                     game.playerAttempts = 1;
                     game.blockPair[1] = undefined;
                     blockPairIndex = 1;
@@ -119,20 +121,35 @@ const Block = struct {
     }
 };
 
+const COLORS = [_][]const u8{
+    "violet",
+    "dark_green",
+    "beige",
+    "brown",
+    "orange",
+    "magenta",
+    "sky_blue",
+    "lime",
+    "yellow",
+};
+
+fn getColorByName(name: []const u8) rl.Color {
+    if (std.mem.eql(u8, name, "violet")) return rl.Color.violet.alpha(0.9);
+    if (std.mem.eql(u8, name, "dark_green")) return rl.Color.dark_green.alpha(0.9);
+    if (std.mem.eql(u8, name, "beige")) return rl.Color.beige.alpha(0.9);
+    if (std.mem.eql(u8, name, "brown")) return rl.Color.brown.alpha(0.9);
+    if (std.mem.eql(u8, name, "orange")) return rl.Color.orange.alpha(0.9);
+    if (std.mem.eql(u8, name, "magenta")) return rl.Color.magenta.alpha(0.9);
+    if (std.mem.eql(u8, name, "sky_blue")) return rl.Color.sky_blue.alpha(0.9);
+    if (std.mem.eql(u8, name, "lime")) return rl.Color.lime.alpha(0.9);
+    if (std.mem.eql(u8, name, "yellow")) return rl.Color.yellow.alpha(0.9);
+    return rl.Color.white;
+}
+
 fn getRandomColor() rl.Color {
-    const colors = [_]rl.Color{
-        rl.Color.violet.alpha(0.9),
-        rl.Color.dark_green.alpha(0.9),
-        rl.Color.beige.alpha(0.9),
-        rl.Color.brown.alpha(0.9),
-        rl.Color.orange.alpha(0.9),
-        rl.Color.magenta.alpha(0.9),
-        rl.Color.sky_blue.alpha(0.9),
-        rl.Color.lime.alpha(0.9),
-        rl.Color.yellow.alpha(0.9),
-    };
-    const randomIndex: usize = @intCast(rl.getRandomValue(0, colors.len - 1));
-    return colors[randomIndex];
+    const randomIndex: usize = @intCast(rl.getRandomValue(0, COLORS.len - 1));
+    const color = COLORS[randomIndex];
+    return getColorByName(color);
 }
 
 const Game = struct {
@@ -161,14 +178,26 @@ const Game = struct {
                 );
                 index += 1;
             }
+            std.log.info("\n", .{});
         }
         self.calculateTotalPairs();
     }
 
     fn calculateTotalPairs(self: *@This()) void {
-        //todo@buraksenyurt Find unique colors and calculate pairs count accordingly
+        self.totalPairCount = 0;
 
-        self.totalPairCount = MAX_BLOCKS / 2;
+        for (COLORS) |colorName| {
+            const targetColor = getColorByName(colorName);
+            var count: usize = 0;
+
+            for (self.blocks) |block| {
+                if (std.meta.eql(block.realColor, targetColor)) {
+                    count += 1;
+                }
+            }
+
+            self.totalPairCount += count / 2;
+        }
     }
 
     pub fn draw(self: @This()) void {
