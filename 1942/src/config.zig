@@ -1,16 +1,19 @@
+const rl = @import("raylib");
+
 pub const Config = struct {
-    pub const screenWidth: i32 = 600;
-    pub const screenHeight: i32 = 800;
-    pub const fps: i32 = 60;
-    pub const titleFontSize: i32 = 30;
-    pub const playerSpeed: f32 = 350.0;
-    pub const playerWidth: f32 = 96.0;
-    pub const playerHeight: f32 = 67.0;
-    pub const botWidth: f32 = 64.0;
-    pub const botHeight: f32 = 64.0;
-    pub const botSpeed: f32 = 60.0;
-    pub const maxBots: usize = 20;
-    pub const fRowCount: usize = 4;
-    pub const fColCount: usize = 5;
-    pub const formationStartY: f32 = -300.0;
+    pub const SCREEN_WIDTH: i32 = 600;
+    pub const SCREEN_HEIGHT: i32 = 800;
+    pub const FPS: i32 = 60;
+    pub const TITLE_FONT_SIZE: i32 = 30;
+    pub const PLAYER_SPEED: f32 = 350.0;
+    pub const PLAYER_WIDTH: f32 = 96.0;
+    pub const PLAYER_HEIGHT: f32 = 67.0;
+    pub const BOT_WIDTH: f32 = 64.0;
+    pub const BOT_HEIGHT: f32 = 64.0;
+    pub const BOT_SPEED: f32 = 60.0;
+    pub const MAX_BOTS: usize = 20;
+    pub const F_ROW_COUNT: usize = 4;
+    pub const F_COL_COUNT: usize = 5;
+    pub const FORMATION_START_Y: f32 = -300.0;
+    pub const BACKGROUND_COLOR = rl.Color{ .r = 190, .g = 136, .b = 113, .a = 100 };
 };
