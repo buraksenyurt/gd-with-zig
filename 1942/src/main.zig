@@ -7,6 +7,7 @@ var gameState: states = .Initial;
 
 pub fn main() !void {
     rl.setRandomSeed(@intCast(std.time.timestamp()));
+
     rl.initWindow(config.screenWidth, config.screenHeight, "1942 Game in Zig with Raylib");
     defer rl.closeWindow();
 
@@ -26,34 +27,9 @@ pub fn main() !void {
     const botTexture = try rl.loadTexture("resources/bot.png");
     defer rl.unloadTexture(botTexture);
 
+    var game = Game.init();
     var player = Player.init(playerTexture);
-    var bots: [config.maxBots]Bot = undefined;
-    const formation = getRandomFormation();
-
-    const formationWidth: f32 = config.fColCount * config.botWidth;
-
-    const offsetX: f32 = (@as(f32, @floatFromInt(config.screenWidth)) - formationWidth) / 2.0;
-    const offsetY: f32 = -300.0;
-
-    var counter: usize = 0;
-    for (formation, 0..) |row, rowIndex| {
-        for (row, 0..) |cell, colIndex| {
-            if (cell == Cell.Bot) {
-                const startX = offsetX + @as(f32, @floatFromInt((colIndex * @as(usize, config.botWidth))));
-                const startY = offsetY + @as(f32, @floatFromInt((rowIndex * @as(usize, config.botHeight))));
-                const b = Bot.init(botTexture, startX, startY);
-                bots[counter] = b;
-                counter += 1;
-            }
-        }
-    }
-
-    // for (0..bots.len) |index| {
-    //     const startX = @as(f32, @floatFromInt((index * 64) + 32));
-    //     const startY: f32 = -150.0;
-    //     const b = Bot.init(botTexture, startX, startY);
-    //     bots[index] = b;
-    // }
+    try game.loadFormation(botTexture);
 
     while (!rl.windowShouldClose()) {
         const deltaTime = rl.getFrameTime();
@@ -82,10 +58,10 @@ pub fn main() !void {
                 player.update(deltaTime);
                 player.draw();
 
-                for (&bots) |*bot| {
+                for (game.bots[0..game.activeBotCount]) |*bot| {
                     bot.update(deltaTime);
                 }
-                for (&bots) |bot| {
+                for (game.bots[0..game.activeBotCount]) |bot| {
                     bot.draw();
                 }
 
@@ -169,10 +145,14 @@ const Player = struct {
     }
 
     pub fn draw(self: @This()) void {
+        // Clamp values to valid integer range before conversion
+        const x = @max(@min(self.position.x, @as(f32, @floatFromInt(std.math.maxInt(i32)))), @as(f32, @floatFromInt(std.math.minInt(i32))));
+        const y = @max(@min(self.position.y, @as(f32, @floatFromInt(std.math.maxInt(i32)))), @as(f32, @floatFromInt(std.math.minInt(i32))));
+
         rl.drawTexture(
             self.asset,
-            @intFromFloat(self.position.x),
-            @intFromFloat(self.position.y),
+            @intFromFloat(x),
+            @intFromFloat(y),
             rl.Color.white,
         );
     }
@@ -193,6 +173,7 @@ const Bot = struct {
     asset: rl.Texture2D,
 
     pub fn init(texture: rl.Texture2D, startX: f32, startY: f32) @This() {
+        // std.log.info("Creating Bot at position ({d}, {d})\n", .{ startX, startY });
         return .{
             .position = rl.Vector2{
                 .x = startX,
@@ -239,7 +220,7 @@ const Cell = enum(u8) {
 
 const formations = [_][config.fRowCount][config.fColCount]Cell{
     .{
-        .{ .Empty, .Empty, .Empty, .Empty, .Empty },
+        .{ .Bot, .Empty, .Empty, .Empty, .Bot },
         .{ .Bot, .Empty, .Empty, .Empty, .Bot },
         .{ .Empty, .Bot, .Empty, .Bot, .Empty },
         .{ .Empty, .Empty, .Bot, .Empty, .Empty },
@@ -264,7 +245,38 @@ const formations = [_][config.fRowCount][config.fColCount]Cell{
     },
 };
 
-fn getRandomFormation() [config.fRowCount][config.fColCount]Cell {
-    const randIndex = @as(usize, @intCast(rl.getRandomValue(0, formations.len - 1)));
-    return formations[randIndex];
-}
+const Game = struct {
+    bots: [config.maxBots]Bot = undefined,
+    activeBotCount: usize = 0,
+
+    pub fn init() @This() {
+        return .{};
+    }
+
+    fn getRandomFormation() [config.fRowCount][config.fColCount]Cell {
+        const randIndex = @as(usize, @intCast(rl.getRandomValue(0, formations.len - 1)));
+        // std.log.info("Selected Formation Index: {d}\n", .{randIndex});
+        return formations[randIndex];
+    }
+
+    pub fn loadFormation(self: *@This(), botTexture: rl.Texture2D) !void {
+        const formation = getRandomFormation();
+        const formationWidth: f32 = config.fColCount * config.botWidth;
+        const offsetX: f32 = (@as(f32, @floatFromInt(config.screenWidth)) - formationWidth) / 2.0;
+        const offsetY: f32 = config.formationStartY;
+
+        var counter: usize = 0;
+        for (formation, 0..) |row, rowIndex| {
+            for (row, 0..) |cell, colIndex| {
+                if (cell == Cell.Bot) {
+                    const startX = offsetX + @as(f32, @floatFromInt((colIndex * @as(usize, config.botWidth))));
+                    const startY = offsetY + @as(f32, @floatFromInt((rowIndex * @as(usize, config.botHeight))));
+                    const b = Bot.init(botTexture, startX, startY);
+                    self.bots[counter] = b;
+                    counter += 1;
+                }
+            }
+        }
+        self.activeBotCount = counter;
+    }
+};
