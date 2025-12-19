@@ -2,6 +2,7 @@ const rl = @import("raylib");
 const config = @import("config.zig").Config;
 const Bot = @import("bot.zig").Bot;
 const Cell = @import("formation.zig").Cell;
+const Mine = @import("mine.zig").Mine;
 const Formations = @import("formation.zig").FORMATION;
 
 pub const States = enum {
@@ -11,7 +12,8 @@ pub const States = enum {
 };
 
 pub const Game = struct {
-    bots: [config.MAX_BOTS]Bot = undefined,
+    bots: [config.MAX_BOT_COUNT]Bot = undefined,
+    mine: [config.MAX_MINE_COUNT]Mine = undefined,
     activeBotCount: usize = 0,
     state: States = .Initial,
 
@@ -44,6 +46,23 @@ pub const Game = struct {
             }
         }
         self.activeBotCount = counter;
+    }
+
+    pub fn loadMines(self: *@This(), mineTexture: rl.Texture2D) !void {
+        for (self.mine[0..]) |*m| {
+            m.*.asset = mineTexture;
+            m.*.position = rl.Vector2{
+                .x = @floatFromInt(rl.getRandomValue(0, config.SCREEN_WIDTH - config.MINE_WIDTH)),
+                .y = @floatFromInt(rl.getRandomValue(0, config.SCREEN_HEIGHT / 2)),
+            };
+            m.*.size = rl.Vector2{
+                .x = config.MINE_WIDTH,
+                .y = config.MINE_HEIGHT,
+            };
+            m.*.isActive = true;
+            // m.*.wakeUpTime = @floatFromInt(rl.getRandomValue(3, 8));
+            m.*.maxLifetime = @floatFromInt(rl.getRandomValue(3, 12));
+        }
     }
 
     pub fn isGameOver(self: *const @This()) bool {

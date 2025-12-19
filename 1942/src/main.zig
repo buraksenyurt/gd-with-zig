@@ -29,9 +29,13 @@ pub fn main() !void {
     const botTexture = try rl.loadTexture("resources/bot.png");
     defer rl.unloadTexture(botTexture);
 
+    const mineTexture = try rl.loadTexture("resources/mine.png");
+    defer rl.unloadTexture(mineTexture);
+
     var game = Game.init();
     var player = Player.init(playerTexture, bulletTexture);
     try game.loadFormation(botTexture);
+    try game.loadMines(mineTexture);
 
     while (!rl.windowShouldClose()) {
         const deltaTime = rl.getFrameTime();
@@ -64,6 +68,10 @@ pub fn main() !void {
                 }
                 for (game.bots[0..game.activeBotCount]) |bot| {
                     bot.draw();
+                }
+                for (game.mine[0..]) |*m| {
+                    m.update(deltaTime);
+                    m.draw();
                 }
 
                 if (game.isGameOver()) {

@@ -8,7 +8,7 @@ pub const Player = struct {
     size: rl.Vector2,
     asset: rl.Texture2D,
     bulletAsset: rl.Texture2D,
-    bullets: [config.MAX_BULLETS]Bullet = undefined,
+    bullets: [config.MAX_BULLET_COUNT]Bullet = undefined,
 
     pub fn init(texture: rl.Texture2D, bulletTexture: rl.Texture2D) @This() {
         var p: Player =
