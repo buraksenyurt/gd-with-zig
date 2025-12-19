@@ -23,11 +23,14 @@ pub fn main() !void {
     const playerTexture = try rl.loadTexture("resources/hero.png");
     defer rl.unloadTexture(playerTexture);
 
+    const bulletTexture = try rl.loadTexture("resources/bullet.png");
+    defer rl.unloadTexture(bulletTexture);
+
     const botTexture = try rl.loadTexture("resources/bot.png");
     defer rl.unloadTexture(botTexture);
 
     var game = Game.init();
-    var player = Player.init(playerTexture);
+    var player = Player.init(playerTexture, bulletTexture);
     try game.loadFormation(botTexture);
 
     while (!rl.windowShouldClose()) {

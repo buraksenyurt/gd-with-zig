@@ -16,4 +16,6 @@ pub const Config = struct {
     pub const F_COL_COUNT: usize = 5;
     pub const FORMATION_START_Y: f32 = -300.0;
     pub const BACKGROUND_COLOR = rl.Color{ .r = 190, .g = 136, .b = 113, .a = 100 };
+    pub const MAX_BULLETS: usize = 5;
+    pub const BULLET_SPEED: f32 = 250.0;
 };
