@@ -19,6 +19,10 @@ pub fn main() !void {
     const sizeOfGameOverText: f32 = @floatFromInt(
         rl.measureText(gameOverText, config.TITLE_FONT_SIZE),
     );
+    const playerWinText = "You Win! Press R to Restart";
+    const sizeOfPlayerWinText: f32 = @floatFromInt(
+        rl.measureText(playerWinText, config.TITLE_FONT_SIZE),
+    );
 
     const playerTexture = try rl.loadTexture("resources/hero.png");
     defer rl.unloadTexture(playerTexture);
@@ -60,8 +64,41 @@ pub fn main() !void {
                 }
             },
             .Playing => {
+                if (game.remainingBots == 0) {
+                    game.state = .PlayerWin;
+                }
+
                 player.update(deltaTime);
                 player.draw();
+
+                for (player.bullets[0..]) |*b| {
+                    for (game.bots[0..game.activeBotCount]) |*bot| {
+                        if (b.isActive and bot.isActive) {
+                            if (rl.checkCollisionRecs(b.getRectangle(), bot.getRectangle())) {
+                                b.isActive = false;
+                                bot.isActive = false;
+                                game.score += 10;
+                                game.remainingBots -= 1;
+                            }
+                        }
+                    }
+                }
+
+                for (game.bots[0..]) |*bot| {
+                    if (bot.isActive) {
+                        if (rl.checkCollisionRecs(player.getRectangle(), bot.getRectangle())) {
+                            game.state = .PlayerLoose;
+                        }
+                    }
+                }
+
+                for (game.mine[0..]) |*m| {
+                    if (m.isActive) {
+                        if (rl.checkCollisionRecs(player.getRectangle(), m.getRectangle())) {
+                            game.state = .PlayerLoose;
+                        }
+                    }
+                }
 
                 for (game.bots[0..game.activeBotCount]) |*bot| {
                     bot.update(deltaTime);
@@ -73,12 +110,20 @@ pub fn main() !void {
                     m.update(deltaTime);
                     m.draw();
                 }
-
-                if (game.isGameOver()) {
-                    game.state = .Ended;
+            },
+            .PlayerWin => {
+                rl.drawText(
+                    playerWinText,
+                    @intFromFloat(config.SCREEN_WIDTH / 2 - sizeOfPlayerWinText / 2),
+                    (config.SCREEN_HEIGHT / 2) - config.TITLE_FONT_SIZE * 2,
+                    config.TITLE_FONT_SIZE,
+                    rl.Color.green,
+                );
+                if (rl.isKeyPressed(rl.KeyboardKey.r)) {
+                    game.state = .Initial;
                 }
             },
-            .Ended => {
+            .PlayerLoose => {
                 rl.drawText(
                     gameOverText,
                     @intFromFloat(config.SCREEN_WIDTH / 2 - sizeOfGameOverText / 2),
