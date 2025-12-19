@@ -10,7 +10,7 @@ pub fn build(b: *std.Build) void {
     const raylib = raylib_dep.module("raylib");
     const raylib_artifact = raylib_dep.artifact("raylib");
 
-    const mod = b.addModule("_1942", .{
+    const mod = b.addModule("ferrisWars", .{
         .root_source_file = b.path("src/root.zig"),
         .target = target,
         .imports = &.{
@@ -19,13 +19,13 @@ pub fn build(b: *std.Build) void {
     });
 
     const exe = b.addExecutable(.{
-        .name = "_1942",
+        .name = "ferrisWars",
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
-                .{ .name = "_1942", .module = mod },
+                .{ .name = "ferrisWars", .module = mod },
                 .{ .name = "raylib", .module = raylib },
             },
         }),

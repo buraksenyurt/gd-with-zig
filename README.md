@@ -14,7 +14,7 @@ Game development practices with Zig programming language and [Raylib](https://gi
 |--------------------|--------------------------------------|----------------------|
 | Space Invaders     | Classic Space Invaders game remake   | 0.15.1               |
 | Blocks             | Memory matching blocks game          | 0.15.1               |
-| 1942               | Classic 1942 game remake             | 0.15.1               |
+| Ferris Wars        | Classic Ferris Wars game             | 0.15.1               |
 
 ## Setup
 
