@@ -9,6 +9,7 @@ pub const Player = struct {
     asset: rl.Texture2D,
     bulletAsset: rl.Texture2D,
     bullets: [config.MAX_BULLET_COUNT]Bullet = undefined,
+    bulletCooldown: f32 = 0.0,
 
     pub fn init(texture: rl.Texture2D, bulletTexture: rl.Texture2D) @This() {
         var p: Player =
@@ -61,13 +62,17 @@ pub const Player = struct {
 
         if (rl.isKeyPressed(rl.KeyboardKey.space)) {
             for (self.bullets[0..]) |*b| {
-                if (!b.isActive) {
+                if (!b.isActive and self.bulletCooldown <= 0) {
                     b.position.x = self.position.x + (self.size.x / 2) - (b.size.x / 2);
                     b.position.y = self.position.y;
                     b.isActive = true;
+                    self.bulletCooldown = config.BULLET_COOLDOWN;
                     break;
                 }
             }
+        }
+        if (self.bulletCooldown > 0) {
+            self.bulletCooldown -= deltaTime;
         }
     }
 

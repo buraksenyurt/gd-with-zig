@@ -6,6 +6,7 @@ pub const Bullet = struct {
     size: rl.Vector2,
     asset: rl.Texture2D,
     isActive: bool = false,
+    cooldown: f32 = 0.0,
 
     pub fn init(texture: rl.Texture2D) @This() {
         return .{
