@@ -6,6 +6,7 @@ const config = @import("config.zig").Config;
 var gameState: states = .Initial;
 
 pub fn main() !void {
+    rl.setRandomSeed(@intCast(std.time.timestamp()));
     rl.initWindow(config.screenWidth, config.screenHeight, "1942 Game in Zig with Raylib");
     defer rl.closeWindow();
 
@@ -22,13 +23,44 @@ pub fn main() !void {
     const playerTexture = try rl.loadTexture("resources/hero.png");
     defer rl.unloadTexture(playerTexture);
 
+    const botTexture = try rl.loadTexture("resources/bot.png");
+    defer rl.unloadTexture(botTexture);
+
     var player = Player.init(playerTexture);
+    var bots: [config.maxBots]Bot = undefined;
+    const formation = getRandomFormation();
+
+    const formationWidth: f32 = config.fColCount * config.botWidth;
+
+    const offsetX: f32 = (@as(f32, @floatFromInt(config.screenWidth)) - formationWidth) / 2.0;
+    const offsetY: f32 = -300.0;
+
+    var counter: usize = 0;
+    for (formation, 0..) |row, rowIndex| {
+        for (row, 0..) |cell, colIndex| {
+            if (cell == Cell.Bot) {
+                const startX = offsetX + @as(f32, @floatFromInt((colIndex * @as(usize, config.botWidth))));
+                const startY = offsetY + @as(f32, @floatFromInt((rowIndex * @as(usize, config.botHeight))));
+                const b = Bot.init(botTexture, startX, startY);
+                bots[counter] = b;
+                counter += 1;
+            }
+        }
+    }
+
+    // for (0..bots.len) |index| {
+    //     const startX = @as(f32, @floatFromInt((index * 64) + 32));
+    //     const startY: f32 = -150.0;
+    //     const b = Bot.init(botTexture, startX, startY);
+    //     bots[index] = b;
+    // }
 
     while (!rl.windowShouldClose()) {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.blue.alpha(0.5));
+        const backgroundColor = rl.Color{ .r = 190, .g = 136, .b = 113, .a = 100 };
+        rl.clearBackground(backgroundColor);
 
         switch (gameState) {
             .Initial => {
@@ -47,6 +79,13 @@ pub fn main() !void {
             .Playing => {
                 player.update();
                 player.draw();
+
+                for (&bots) |*bot| {
+                    bot.update();
+                }
+                for (&bots) |bot| {
+                    bot.draw();
+                }
 
                 if (isGameOver()) {
                     gameState = .Ended;
@@ -143,3 +182,85 @@ const Player = struct {
         };
     }
 };
+
+const Bot = struct {
+    position: rl.Vector2,
+    size: rl.Vector2,
+    asset: rl.Texture2D,
+
+    pub fn init(texture: rl.Texture2D, startX: f32, startY: f32) @This() {
+        return .{
+            .position = rl.Vector2{
+                .x = startX,
+                .y = startY,
+            },
+            .size = rl.Vector2{
+                .x = config.botWidth,
+                .y = config.botHeight,
+            },
+            .asset = texture,
+        };
+    }
+
+    pub fn update(self: *@This()) void {
+        self.position.y += config.botSpeed;
+        if (self.position.y > @as(f32, config.screenHeight)) {
+            self.position.y = -self.size.y;
+        }
+    }
+
+    pub fn draw(self: @This()) void {
+        rl.drawTexture(
+            self.asset,
+            @intFromFloat(self.position.x),
+            @intFromFloat(self.position.y),
+            rl.Color.white,
+        );
+    }
+
+    pub fn getRectangle(self: *const Bot) rl.Rectangle {
+        return rl.Rectangle{
+            .x = self.position.x,
+            .y = self.position.y,
+            .width = self.size.x,
+            .height = self.size.y,
+        };
+    }
+};
+
+const Cell = enum(u8) {
+    Empty = 0,
+    Bot = 1,
+};
+
+const formations = [_][config.fRowCount][config.fColCount]Cell{
+    .{
+        .{ .Empty, .Empty, .Empty, .Empty, .Empty },
+        .{ .Bot, .Empty, .Empty, .Empty, .Bot },
+        .{ .Empty, .Bot, .Empty, .Bot, .Empty },
+        .{ .Empty, .Empty, .Bot, .Empty, .Empty },
+    },
+    .{
+        .{ .Empty, .Empty, .Empty, .Empty, .Empty },
+        .{ .Empty, .Bot, .Empty, .Bot, .Empty },
+        .{ .Bot, .Empty, .Bot, .Empty, .Bot },
+        .{ .Empty, .Bot, .Empty, .Bot, .Empty },
+    },
+    .{
+        .{ .Empty, .Bot, .Empty, .Bot, .Empty },
+        .{ .Bot, .Empty, .Bot, .Empty, .Bot },
+        .{ .Empty, .Bot, .Empty, .Bot, .Empty },
+        .{ .Bot, .Empty, .Bot, .Empty, .Bot },
+    },
+    .{
+        .{ .Bot, .Empty, .Bot, .Empty, .Bot },
+        .{ .Bot, .Empty, .Bot, .Empty, .Bot },
+        .{ .Bot, .Empty, .Bot, .Empty, .Bot },
+        .{ .Bot, .Empty, .Bot, .Empty, .Bot },
+    },
+};
+
+fn getRandomFormation() [config.fRowCount][config.fColCount]Cell {
+    const randIndex = @as(usize, @intCast(rl.getRandomValue(0, formations.len - 1)));
+    return formations[randIndex];
+}
