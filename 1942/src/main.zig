@@ -56,6 +56,8 @@ pub fn main() !void {
     // }
 
     while (!rl.windowShouldClose()) {
+        const deltaTime = rl.getFrameTime();
+
         rl.beginDrawing();
         defer rl.endDrawing();
 
@@ -77,11 +79,11 @@ pub fn main() !void {
                 }
             },
             .Playing => {
-                player.update();
+                player.update(deltaTime);
                 player.draw();
 
                 for (&bots) |*bot| {
-                    bot.update();
+                    bot.update(deltaTime);
                 }
                 for (&bots) |bot| {
                     bot.draw();
@@ -137,27 +139,29 @@ const Player = struct {
         };
     }
 
-    pub fn update(self: *@This()) void {
+    pub fn update(self: *@This(), deltaTime: f32) void {
+        const movement = config.playerSpeed * deltaTime;
+
         if (rl.isKeyDown(rl.KeyboardKey.right)) {
-            self.position.x += config.playerSpeed;
+            self.position.x += movement;
             if (self.position.x > @as(f32, @floatFromInt(config.screenWidth)) - self.size.x) {
                 self.position.x = @as(f32, @floatFromInt(config.screenWidth)) - self.size.x;
             }
         }
         if (rl.isKeyDown(rl.KeyboardKey.left)) {
-            self.position.x -= config.playerSpeed;
+            self.position.x -= movement;
             if (self.position.x < 0) {
                 self.position.x = 0;
             }
         }
         if (rl.isKeyDown(rl.KeyboardKey.up)) {
-            self.position.y -= config.playerSpeed;
+            self.position.y -= movement;
             if (self.position.y < 0) {
                 self.position.y = 0;
             }
         }
         if (rl.isKeyDown(rl.KeyboardKey.down)) {
-            self.position.y += config.playerSpeed;
+            self.position.y += movement;
             if (self.position.y > @as(f32, @floatFromInt(config.screenHeight)) - self.size.y) {
                 self.position.y = @as(f32, @floatFromInt(config.screenHeight)) - self.size.y;
             }
@@ -202,8 +206,8 @@ const Bot = struct {
         };
     }
 
-    pub fn update(self: *@This()) void {
-        self.position.y += config.botSpeed;
+    pub fn update(self: *@This(), deltaTime: f32) void {
+        self.position.y += config.botSpeed * deltaTime;
         if (self.position.y > @as(f32, config.screenHeight)) {
             self.position.y = -self.size.y;
         }
