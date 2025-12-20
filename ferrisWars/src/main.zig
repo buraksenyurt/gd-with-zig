@@ -7,14 +7,11 @@ const Game = @import("game.zig").Game;
 pub fn main() !void {
     rl.setRandomSeed(@intCast(std.time.timestamp()));
 
-    rl.initWindow(config.SCREEN_WIDTH, config.SCREEN_HEIGHT, "1942 Game in Zig with Raylib");
+    rl.initWindow(config.SCREEN_WIDTH, config.SCREEN_HEIGHT, "Ferris Wars Game in Zig with Raylib");
     defer rl.closeWindow();
 
     rl.setTargetFPS(config.FPS);
-    const titleText = rl.textFormat("1942 Game - Zig + Raylib\nPress ENTER to Start", .{});
-    const sizeOfTitleText: f32 = @floatFromInt(
-        rl.measureText(titleText, config.TITLE_FONT_SIZE),
-    );
+
     const gameOverText = "Game Over! Press R to Restart";
     const sizeOfGameOverText: f32 = @floatFromInt(
         rl.measureText(gameOverText, config.TITLE_FONT_SIZE),
@@ -36,12 +33,14 @@ pub fn main() !void {
     const mineTexture = try rl.loadTexture("resources/mine.png");
     defer rl.unloadTexture(mineTexture);
 
-    var game = Game.init();
-    var player = Player.init(playerTexture, bulletTexture);
-    try game.loadFormation(botTexture);
-    try game.loadMines(mineTexture);
+    var game = try Game.init(
+        playerTexture,
+        botTexture,
+        bulletTexture,
+        mineTexture,
+    );
 
-    while (!rl.windowShouldClose()) {
+    gameLoop: while (!rl.windowShouldClose()) {
         const deltaTime = rl.getFrameTime();
 
         rl.beginDrawing();
@@ -51,6 +50,11 @@ pub fn main() !void {
 
         switch (game.state) {
             .Initial => {
+                const titleText = rl.textFormat("Ferris Wars - Zig + Raylib\nPress ENTER to Start", .{});
+                const sizeOfTitleText: f32 = @floatFromInt(
+                    rl.measureText(titleText, config.TITLE_FONT_SIZE),
+                );
+
                 rl.drawText(
                     titleText,
                     @intFromFloat(config.SCREEN_WIDTH / 2 - sizeOfTitleText / 2),
@@ -66,12 +70,13 @@ pub fn main() !void {
             .Playing => {
                 if (game.remainingBots == 0) {
                     game.state = .PlayerWin;
+                    continue :gameLoop;
                 }
 
-                player.update(deltaTime);
-                player.draw();
+                game.player.update(deltaTime);
+                game.player.draw();
 
-                for (player.bullets[0..]) |*b| {
+                for (game.player.bullets[0..]) |*b| {
                     for (game.bots[0..game.activeBotCount]) |*bot| {
                         if (b.isActive and bot.isActive) {
                             if (rl.checkCollisionRecs(b.getRectangle(), bot.getRectangle())) {
@@ -86,16 +91,18 @@ pub fn main() !void {
 
                 for (game.bots[0..]) |*bot| {
                     if (bot.isActive) {
-                        if (rl.checkCollisionRecs(player.getRectangle(), bot.getRectangle())) {
+                        if (rl.checkCollisionRecs(game.player.getRectangle(), bot.getRectangle())) {
                             game.state = .PlayerLoose;
+                            continue :gameLoop;
                         }
                     }
                 }
 
                 for (game.mine[0..]) |*m| {
                     if (m.isActive) {
-                        if (rl.checkCollisionRecs(player.getRectangle(), m.getRectangle())) {
+                        if (rl.checkCollisionRecs(game.player.getRectangle(), m.getRectangle())) {
                             game.state = .PlayerLoose;
+                            continue :gameLoop;
                         }
                     }
                 }
@@ -120,7 +127,8 @@ pub fn main() !void {
                     rl.Color.green,
                 );
                 if (rl.isKeyPressed(rl.KeyboardKey.r)) {
-                    game.state = .Initial;
+                    try game.reset();
+                    continue :gameLoop;
                 }
             },
             .PlayerLoose => {
@@ -132,7 +140,8 @@ pub fn main() !void {
                     rl.Color.red,
                 );
                 if (rl.isKeyPressed(rl.KeyboardKey.r)) {
-                    game.state = .Initial;
+                    try game.reset();
+                    continue :gameLoop;
                 }
             },
         }
