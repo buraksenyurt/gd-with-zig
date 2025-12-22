@@ -5,6 +5,7 @@ pub const AssetServer = struct {
     bots: [3]rl.Texture2D = undefined,
     bullet: rl.Texture2D = undefined,
     mine: rl.Texture2D = undefined,
+    cover: rl.Texture2D = undefined,
 
     pub fn load() !@This() {
         var assets = @This(){};
@@ -14,6 +15,7 @@ pub const AssetServer = struct {
         assets.bots[2] = try rl.loadTexture("resources/bot_3.png");
         assets.bullet = try rl.loadTexture("resources/bullet.png");
         assets.mine = try rl.loadTexture("resources/mine.png");
+        assets.cover = try rl.loadTexture("resources/cover.png");
 
         return assets;
     }
@@ -25,5 +27,6 @@ pub const AssetServer = struct {
         }
         rl.unloadTexture(self.bullet);
         rl.unloadTexture(self.mine);
+        rl.unloadTexture(self.cover);
     }
 };

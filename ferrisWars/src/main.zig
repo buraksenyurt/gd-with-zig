@@ -24,22 +24,12 @@ pub fn main() !void {
 
     const hudText = "Score: %d Remaining: %d Bullets: %d";
 
-    // const playerTexture = try rl.loadTexture("resources/hero.png");
-    // defer rl.unloadTexture(playerTexture);
-
-    // const bulletTexture = try rl.loadTexture("resources/bullet.png");
-    // defer rl.unloadTexture(bulletTexture);
-
-    // const botTexture = try rl.loadTexture("resources/bot_1.png");
-    // defer rl.unloadTexture(botTexture);
-
-    // const mineTexture = try rl.loadTexture("resources/mine.png");
-    // defer rl.unloadTexture(mineTexture);
     const assetServer = try AssetServer.load();
 
     var game = try Game.init(
         assetServer,
     );
+    defer assetServer.unload();
 
     gameLoop: while (!rl.windowShouldClose()) {
         const deltaTime = rl.getFrameTime();
@@ -71,16 +61,10 @@ pub fn main() !void {
 
         switch (game.state) {
             .Initial => {
-                const titleText = rl.textFormat("Ferris Wars - Zig + Raylib\nPress ENTER to Start", .{});
-                const sizeOfTitleText: f32 = @floatFromInt(
-                    rl.measureText(titleText, config.TITLE_FONT_SIZE),
-                );
-
-                rl.drawText(
-                    titleText,
-                    @intFromFloat(config.SCREEN_WIDTH / 2 - sizeOfTitleText / 2),
-                    (config.AREA_HEIGHT / 2) - config.TITLE_FONT_SIZE * 2,
-                    config.TITLE_FONT_SIZE,
+                rl.drawTexture(
+                    assetServer.cover,
+                    0,
+                    0,
                     rl.Color.white,
                 );
 
@@ -169,5 +153,4 @@ pub fn main() !void {
             },
         }
     }
-    assetServer.unload();
 }
