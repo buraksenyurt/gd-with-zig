@@ -30,4 +30,22 @@ pub const FORMATION = [_][config.F_ROW_COUNT][config.F_COL_COUNT]Cell{
         .{ .Bot, .Empty, .Bot, .Empty, .Bot },
         .{ .Bot, .Empty, .Bot, .Empty, .Bot },
     },
+    .{
+        .{ .Empty, .Empty, .Bot, .Empty, .Empty },
+        .{ .Empty, .Bot, .Bot, .Bot, .Empty },
+        .{ .Bot, .Bot, .Bot, .Bot, .Bot },
+        .{ .Empty, .Empty, .Bot, .Empty, .Empty },
+    },
+    .{
+        .{ .Bot, .Bot, .Bot, .Bot, .Bot },
+        .{ .Empty, .Bot, .Bot, .Bot, .Empty },
+        .{ .Empty, .Empty, .Bot, .Empty, .Empty },
+        .{ .Empty, .Empty, .Bot, .Empty, .Empty },
+    },
+    .{
+        .{ .Empty, .Empty, .Empty, .Empty, .Empty },
+        .{ .Empty, .Empty, .Bot, .Empty, .Empty },
+        .{ .Empty, .Bot, .Bot, .Bot, .Empty },
+        .{ .Bot, .Bot, .Bot, .Bot, .Bot },
+    },
 };

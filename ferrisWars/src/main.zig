@@ -29,7 +29,7 @@ pub fn main() !void {
     const bulletTexture = try rl.loadTexture("resources/bullet.png");
     defer rl.unloadTexture(bulletTexture);
 
-    const botTexture = try rl.loadTexture("resources/bot.png");
+    const botTexture = try rl.loadTexture("resources/bot_1.png");
     defer rl.unloadTexture(botTexture);
 
     const mineTexture = try rl.loadTexture("resources/mine.png");
@@ -67,7 +67,7 @@ pub fn main() !void {
             10.0,
             config.AREA_HEIGHT + 10,
             config.TITLE_FONT_SIZE,
-            rl.Color.white,
+            config.HUD_FONT_COLOR,
         );
 
         switch (game.state) {
@@ -141,12 +141,13 @@ pub fn main() !void {
                 }
             },
             .PlayerWin => {
+                rl.clearBackground(config.WIN_BACKGROUND_COLOR);
                 rl.drawText(
                     playerWinText,
                     @intFromFloat(config.SCREEN_WIDTH / 2 - sizeOfPlayerWinText / 2),
                     (config.SCREEN_HEIGHT / 2) - config.TITLE_FONT_SIZE * 2,
                     config.TITLE_FONT_SIZE,
-                    rl.Color.green,
+                    rl.Color.white,
                 );
                 if (rl.isKeyPressed(rl.KeyboardKey.r)) {
                     try game.reset();
@@ -154,12 +155,13 @@ pub fn main() !void {
                 }
             },
             .PlayerLoose => {
+                rl.clearBackground(config.LOOSE_BACKGROUND_COLOR);
                 rl.drawText(
                     gameOverText,
                     @intFromFloat(config.SCREEN_WIDTH / 2 - sizeOfGameOverText / 2),
                     (config.SCREEN_HEIGHT / 2) - config.TITLE_FONT_SIZE * 2,
                     config.TITLE_FONT_SIZE,
-                    rl.Color.red,
+                    rl.Color.white,
                 );
                 if (rl.isKeyPressed(rl.KeyboardKey.r)) {
                     try game.reset();

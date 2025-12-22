@@ -13,7 +13,7 @@ pub const Mine = struct {
 
     pub fn update(self: *@This(), deltaTime: f32) void {
         if (!self.isActive) return;
-        self.currentLifetime += deltaTime;
+        self.currentLifetime += deltaTime; // Convert to milliseconds
         if (self.currentLifetime >= self.maxLifetime) {
             self.isActive = false;
         }
@@ -26,15 +26,6 @@ pub const Mine = struct {
             @intFromFloat(self.position.x),
             @intFromFloat(self.position.y),
             rl.Color.white,
-        );
-        const text = rl.textFormat("%d", .{self.currentLifetime});
-        // std.log.info("Mine Lifetime: {}\n", .{self.currentLifetime});
-        rl.drawText(
-            text,
-            @intFromFloat(self.position.x),
-            @intFromFloat(self.position.y - 20.0),
-            10,
-            rl.Color.red,
         );
     }
 

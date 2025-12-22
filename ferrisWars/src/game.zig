@@ -49,6 +49,7 @@ pub const Game = struct {
         self.activeBotCount = 0;
         self.remainingBots = 0;
         self.player.bulletCooldown = 0.0;
+        self.player.totalBulletsFired = 0;
         self.player.position = rl.Vector2{
             .x = config.SCREEN_WIDTH / 2 - config.PLAYER_WIDTH / 2,
             .y = config.AREA_HEIGHT - config.PLAYER_HEIGHT,
@@ -102,8 +103,8 @@ pub const Game = struct {
         for (self.mine[0..]) |*m| {
             m.*.asset = mineTexture;
             m.*.position = rl.Vector2{
-                .x = @floatFromInt(rl.getRandomValue(0, config.SCREEN_WIDTH - config.MINE_WIDTH)),
-                .y = @floatFromInt(rl.getRandomValue(0, config.AREA_HEIGHT / 2)),
+                .x = @floatFromInt(rl.getRandomValue(0, config.SCREEN_WIDTH - config.MINE_WIDTH * 2)),
+                .y = @floatFromInt(rl.getRandomValue(config.MINE_HEIGHT * 2, config.AREA_HEIGHT / 2)),
             };
             m.*.size = rl.Vector2{
                 .x = config.MINE_WIDTH,
@@ -111,7 +112,7 @@ pub const Game = struct {
             };
             m.*.isActive = true;
             // m.*.wakeUpTime = @floatFromInt(rl.getRandomValue(3, 8));
-            m.*.maxLifetime = @floatFromInt(rl.getRandomValue(3, 12));
+            m.*.maxLifetime = @floatFromInt(rl.getRandomValue(config.MINE_LIFETIME_RANGE[0], config.MINE_LIFETIME_RANGE[1]));
         }
     }
 };
