@@ -2,6 +2,7 @@ const rl = @import("raylib");
 const config = @import("config.zig").Config;
 const std = @import("std");
 const Bullet = @import("bullet.zig").Bullet;
+const AssetServer = @import("assetServer.zig").AssetServer;
 
 pub const Player = struct {
     position: rl.Vector2,
@@ -12,7 +13,7 @@ pub const Player = struct {
     bulletCooldown: f32 = 0.0,
     totalBulletsFired: u32 = 0,
 
-    pub fn init(texture: rl.Texture2D, bulletTexture: rl.Texture2D) @This() {
+    pub fn init(assetServer: AssetServer) @This() {
         var p: Player =
             .{
                 .position = rl.Vector2{
@@ -23,11 +24,11 @@ pub const Player = struct {
                     .x = config.PLAYER_WIDTH,
                     .y = config.PLAYER_HEIGHT,
                 },
-                .asset = texture,
-                .bulletAsset = bulletTexture,
+                .asset = assetServer.player,
+                .bulletAsset = assetServer.bullet,
             };
         for (p.bullets[0..]) |*b| {
-            b.* = Bullet.init(bulletTexture);
+            b.* = Bullet.init(assetServer.bullet);
         }
 
         return p;

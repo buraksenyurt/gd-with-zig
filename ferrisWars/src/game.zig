@@ -5,6 +5,7 @@ const Cell = @import("formation.zig").Cell;
 const Mine = @import("mine.zig").Mine;
 const Player = @import("player.zig").Player;
 const Formations = @import("formation.zig").FORMATION;
+const AssetServer = @import("assetServer.zig").AssetServer;
 
 pub const States = enum {
     Initial,
@@ -21,12 +22,10 @@ pub const Game = struct {
     state: States = .Initial,
     score: u32 = 0,
     remainingBots: usize = 0,
+    assetServer: AssetServer,
 
     pub fn init(
-        playerTexture: rl.Texture2D,
-        botTexture: rl.Texture2D,
-        bulletTexture: rl.Texture2D,
-        mineTexture: rl.Texture2D,
+        assetServer: AssetServer,
     ) !@This() {
         var game = @This(){
             .player = undefined,
@@ -36,10 +35,12 @@ pub const Game = struct {
             .state = .Initial,
             .score = 0,
             .remainingBots = 0,
+            .assetServer = undefined,
         };
-        game.player = Player.init(playerTexture, bulletTexture);
-        try game.loadFormation(botTexture);
-        try game.loadMines(mineTexture);
+        game.player = Player.init(assetServer);
+        game.assetServer = assetServer;
+        try game.loadFormation();
+        try game.loadMines();
         return game;
     }
 
@@ -67,8 +68,8 @@ pub const Game = struct {
         for (self.mine[0..]) |*m| {
             m.*.isActive = false;
         }
-        _ = try self.loadFormation(self.bots[0].asset);
-        _ = try self.loadMines(self.mine[0].asset);
+        _ = try self.loadFormation();
+        _ = try self.loadMines();
     }
 
     fn getRandomFormation() [config.F_ROW_COUNT][config.F_COL_COUNT]Cell {
@@ -77,7 +78,7 @@ pub const Game = struct {
         return Formations[randIndex];
     }
 
-    fn loadFormation(self: *@This(), botTexture: rl.Texture2D) !void {
+    fn loadFormation(self: *@This()) !void {
         const formation = getRandomFormation();
         const formationWidth: f32 = config.F_COL_COUNT * config.BOT_WIDTH;
         const offsetX: f32 = (@as(f32, @floatFromInt(config.SCREEN_WIDTH)) - formationWidth) / 2.0;
@@ -89,7 +90,8 @@ pub const Game = struct {
                 if (cell == Cell.Bot) {
                     const startX = offsetX + @as(f32, @floatFromInt((colIndex * @as(usize, config.BOT_WIDTH))));
                     const startY = offsetY + @as(f32, @floatFromInt((rowIndex * @as(usize, config.BOT_HEIGHT))));
-                    const b = Bot.init(botTexture, startX, startY);
+                    const botId: usize = @intCast(rl.getRandomValue(0, self.assetServer.bots.len - 1));
+                    const b = Bot.init(self.assetServer.bots[botId], startX, startY);
                     self.bots[counter] = b;
                     self.remainingBots += 1;
                     counter += 1;
@@ -99,9 +101,9 @@ pub const Game = struct {
         self.activeBotCount = counter;
     }
 
-    fn loadMines(self: *@This(), mineTexture: rl.Texture2D) !void {
+    fn loadMines(self: *@This()) !void {
         for (self.mine[0..]) |*m| {
-            m.*.asset = mineTexture;
+            m.*.asset = self.assetServer.mine;
             m.*.position = rl.Vector2{
                 .x = @floatFromInt(rl.getRandomValue(0, config.SCREEN_WIDTH - config.MINE_WIDTH * 2)),
                 .y = @floatFromInt(rl.getRandomValue(config.MINE_HEIGHT * 2, config.AREA_HEIGHT / 2)),

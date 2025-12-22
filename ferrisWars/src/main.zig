@@ -3,6 +3,7 @@ const rl = @import("raylib");
 const config = @import("config.zig").Config;
 const Player = @import("player.zig").Player;
 const Game = @import("game.zig").Game;
+const AssetServer = @import("assetServer.zig").AssetServer;
 
 pub fn main() !void {
     rl.setRandomSeed(@intCast(std.time.timestamp()));
@@ -23,23 +24,21 @@ pub fn main() !void {
 
     const hudText = "Score: %d Remaining: %d Bullets: %d";
 
-    const playerTexture = try rl.loadTexture("resources/hero.png");
-    defer rl.unloadTexture(playerTexture);
+    // const playerTexture = try rl.loadTexture("resources/hero.png");
+    // defer rl.unloadTexture(playerTexture);
 
-    const bulletTexture = try rl.loadTexture("resources/bullet.png");
-    defer rl.unloadTexture(bulletTexture);
+    // const bulletTexture = try rl.loadTexture("resources/bullet.png");
+    // defer rl.unloadTexture(bulletTexture);
 
-    const botTexture = try rl.loadTexture("resources/bot_1.png");
-    defer rl.unloadTexture(botTexture);
+    // const botTexture = try rl.loadTexture("resources/bot_1.png");
+    // defer rl.unloadTexture(botTexture);
 
-    const mineTexture = try rl.loadTexture("resources/mine.png");
-    defer rl.unloadTexture(mineTexture);
+    // const mineTexture = try rl.loadTexture("resources/mine.png");
+    // defer rl.unloadTexture(mineTexture);
+    const assetServer = try AssetServer.load();
 
     var game = try Game.init(
-        playerTexture,
-        botTexture,
-        bulletTexture,
-        mineTexture,
+        assetServer,
     );
 
     gameLoop: while (!rl.windowShouldClose()) {
@@ -170,4 +169,5 @@ pub fn main() !void {
             },
         }
     }
+    assetServer.unload();
 }
