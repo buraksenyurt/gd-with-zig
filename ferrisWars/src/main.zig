@@ -4,6 +4,9 @@ const config = @import("config.zig").Config;
 const Player = @import("player.zig").Player;
 const Game = @import("game.zig").Game;
 const AssetServer = @import("assetServer.zig").AssetServer;
+const TextBlock = @import("textBlock.zig").TextBlock;
+const TextAlignment = @import("textBlock.zig").TextAlignment;
+const Designer = @import("designer.zig");
 
 pub fn main() !void {
     rl.setRandomSeed(@intCast(std.time.timestamp()));
@@ -12,17 +15,6 @@ pub fn main() !void {
     defer rl.closeWindow();
 
     rl.setTargetFPS(config.FPS);
-
-    const gameOverText = "Game Over! Press R to Restart";
-    const sizeOfGameOverText: f32 = @floatFromInt(
-        rl.measureText(gameOverText, config.TITLE_FONT_SIZE),
-    );
-    const playerWinText = "You Win! Press R to Restart";
-    const sizeOfPlayerWinText: f32 = @floatFromInt(
-        rl.measureText(playerWinText, config.TITLE_FONT_SIZE),
-    );
-
-    const hudText = "Score: %d Remaining: %d Bullets: %d";
 
     const assetServer = try AssetServer.load();
 
@@ -46,17 +38,9 @@ pub fn main() !void {
             config.SCREEN_HEIGHT - config.AREA_HEIGHT,
             config.HUD_BACKGROUND_COLOR,
         );
-        const hudDisplayText = rl.textFormat(hudText, .{
-            game.score,
-            game.remainingBots,
-            game.player.totalBulletsFired,
-        });
-        rl.drawText(
-            hudDisplayText,
-            10.0,
-            config.AREA_HEIGHT + 10,
-            config.TITLE_FONT_SIZE,
-            config.HUD_FONT_COLOR,
+        Designer.hudText.draw(
+            .Left,
+            .{ game.score, game.remainingBots, game.player.totalBulletsFired },
         );
 
         switch (game.state) {
@@ -68,7 +52,7 @@ pub fn main() !void {
                     rl.Color.white,
                 );
 
-                if (rl.isKeyPressed(rl.KeyboardKey.enter)) {
+                if (rl.isKeyPressed(rl.KeyboardKey.enter) or rl.isMouseButtonPressed(rl.MouseButton.left)) {
                     game.state = .Playing;
                 }
             },
@@ -125,13 +109,7 @@ pub fn main() !void {
             },
             .PlayerWin => {
                 rl.clearBackground(config.WIN_BACKGROUND_COLOR);
-                rl.drawText(
-                    playerWinText,
-                    @intFromFloat(config.SCREEN_WIDTH / 2 - sizeOfPlayerWinText / 2),
-                    (config.SCREEN_HEIGHT / 2) - config.TITLE_FONT_SIZE * 2,
-                    config.TITLE_FONT_SIZE,
-                    rl.Color.white,
-                );
+                Designer.playerWinText.draw(TextAlignment.Center, .{});
                 if (rl.isKeyPressed(rl.KeyboardKey.r)) {
                     try game.reset();
                     continue :gameLoop;
@@ -139,13 +117,8 @@ pub fn main() !void {
             },
             .PlayerLoose => {
                 rl.clearBackground(config.LOOSE_BACKGROUND_COLOR);
-                rl.drawText(
-                    gameOverText,
-                    @intFromFloat(config.SCREEN_WIDTH / 2 - sizeOfGameOverText / 2),
-                    (config.SCREEN_HEIGHT / 2) - config.TITLE_FONT_SIZE * 2,
-                    config.TITLE_FONT_SIZE,
-                    rl.Color.white,
-                );
+                Designer.gameOverText.draw(TextAlignment.Center, .{});
+
                 if (rl.isKeyPressed(rl.KeyboardKey.r)) {
                     try game.reset();
                     continue :gameLoop;
