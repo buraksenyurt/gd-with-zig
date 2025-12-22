@@ -10,13 +10,14 @@ pub const Player = struct {
     bulletAsset: rl.Texture2D,
     bullets: [config.MAX_BULLET_COUNT]Bullet = undefined,
     bulletCooldown: f32 = 0.0,
+    totalBulletsFired: u32 = 0,
 
     pub fn init(texture: rl.Texture2D, bulletTexture: rl.Texture2D) @This() {
         var p: Player =
             .{
                 .position = rl.Vector2{
                     .x = config.SCREEN_WIDTH / 2 - config.PLAYER_WIDTH / 2,
-                    .y = config.SCREEN_HEIGHT - config.PLAYER_HEIGHT,
+                    .y = config.AREA_HEIGHT - config.PLAYER_HEIGHT,
                 },
                 .size = rl.Vector2{
                     .x = config.PLAYER_WIDTH,
@@ -55,8 +56,8 @@ pub const Player = struct {
         }
         if (rl.isKeyDown(rl.KeyboardKey.down)) {
             self.position.y += movement;
-            if (self.position.y > @as(f32, @floatFromInt(config.SCREEN_HEIGHT)) - self.size.y) {
-                self.position.y = @as(f32, @floatFromInt(config.SCREEN_HEIGHT)) - self.size.y;
+            if (self.position.y > @as(f32, @floatFromInt(config.AREA_HEIGHT)) - self.size.y) {
+                self.position.y = @as(f32, @floatFromInt(config.AREA_HEIGHT)) - self.size.y;
             }
         }
 
@@ -67,6 +68,7 @@ pub const Player = struct {
                     b.position.y = self.position.y;
                     b.isActive = true;
                     self.bulletCooldown = config.BULLET_COOLDOWN;
+                    self.totalBulletsFired += 1;
                     break;
                 }
             }

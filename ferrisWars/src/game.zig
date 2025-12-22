@@ -51,7 +51,7 @@ pub const Game = struct {
         self.player.bulletCooldown = 0.0;
         self.player.position = rl.Vector2{
             .x = config.SCREEN_WIDTH / 2 - config.PLAYER_WIDTH / 2,
-            .y = config.SCREEN_HEIGHT - config.PLAYER_HEIGHT,
+            .y = config.AREA_HEIGHT - config.PLAYER_HEIGHT,
         };
         for (self.player.bullets[0..]) |*b| {
             b.*.isActive = false;
@@ -103,7 +103,7 @@ pub const Game = struct {
             m.*.asset = mineTexture;
             m.*.position = rl.Vector2{
                 .x = @floatFromInt(rl.getRandomValue(0, config.SCREEN_WIDTH - config.MINE_WIDTH)),
-                .y = @floatFromInt(rl.getRandomValue(0, config.SCREEN_HEIGHT / 2)),
+                .y = @floatFromInt(rl.getRandomValue(0, config.AREA_HEIGHT / 2)),
             };
             m.*.size = rl.Vector2{
                 .x = config.MINE_WIDTH,

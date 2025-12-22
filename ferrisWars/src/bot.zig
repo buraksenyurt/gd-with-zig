@@ -26,7 +26,7 @@ pub const Bot = struct {
     pub fn update(self: *@This(), deltaTime: f32) void {
         if (!self.isActive) return;
         self.position.y += config.BOT_SPEED * deltaTime;
-        if (self.position.y > @as(f32, config.SCREEN_HEIGHT)) {
+        if (self.position.y > @as(f32, config.AREA_HEIGHT)) {
             self.position.y = -self.size.y;
         }
     }

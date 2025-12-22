@@ -21,6 +21,8 @@ pub fn main() !void {
         rl.measureText(playerWinText, config.TITLE_FONT_SIZE),
     );
 
+    const hudText = "Score: %d Remaining: %d Bullets: %d";
+
     const playerTexture = try rl.loadTexture("resources/hero.png");
     defer rl.unloadTexture(playerTexture);
 
@@ -48,6 +50,26 @@ pub fn main() !void {
 
         rl.clearBackground(config.BACKGROUND_COLOR);
 
+        rl.drawRectangle(
+            0,
+            config.AREA_HEIGHT,
+            config.SCREEN_WIDTH,
+            config.SCREEN_HEIGHT - config.AREA_HEIGHT,
+            config.HUD_BACKGROUND_COLOR,
+        );
+        const hudDisplayText = rl.textFormat(hudText, .{
+            game.score,
+            game.remainingBots,
+            game.player.totalBulletsFired,
+        });
+        rl.drawText(
+            hudDisplayText,
+            10.0,
+            config.AREA_HEIGHT + 10,
+            config.TITLE_FONT_SIZE,
+            rl.Color.white,
+        );
+
         switch (game.state) {
             .Initial => {
                 const titleText = rl.textFormat("Ferris Wars - Zig + Raylib\nPress ENTER to Start", .{});
@@ -58,7 +80,7 @@ pub fn main() !void {
                 rl.drawText(
                     titleText,
                     @intFromFloat(config.SCREEN_WIDTH / 2 - sizeOfTitleText / 2),
-                    (config.SCREEN_HEIGHT / 2) - config.TITLE_FONT_SIZE * 2,
+                    (config.AREA_HEIGHT / 2) - config.TITLE_FONT_SIZE * 2,
                     config.TITLE_FONT_SIZE,
                     rl.Color.white,
                 );
