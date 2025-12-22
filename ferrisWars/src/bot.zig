@@ -1,8 +1,10 @@
 const rl = @import("raylib");
 const config = @import("config.zig").Config;
+const std = @import("std");
 
 pub const Bot = struct {
     position: rl.Vector2,
+    initialX: f32,
     size: rl.Vector2,
     asset: rl.Texture2D,
     isActive: bool = false,
@@ -14,6 +16,7 @@ pub const Bot = struct {
                 .x = startX,
                 .y = startY,
             },
+            .initialX = startX,
             .size = rl.Vector2{
                 .x = config.BOT_WIDTH,
                 .y = config.BOT_HEIGHT,
@@ -25,7 +28,16 @@ pub const Bot = struct {
 
     pub fn update(self: *@This(), deltaTime: f32) void {
         if (!self.isActive) return;
-        self.position.y += config.BOT_SPEED * deltaTime;
+
+        self.position.y += config.BOT_VERTICAL_SPEED * deltaTime;
+        self.position.x = self.initialX + (std.math.sin(self.position.y * 0.05) * config.BOT_HORIZONTAL_SPEED);
+
+        if (self.position.x < 0) {
+            self.position.x = 0;
+        } else if (self.position.x > @as(f32, config.SCREEN_WIDTH) - self.size.x) {
+            self.position.x = @as(f32, config.SCREEN_WIDTH) - self.size.x;
+        }
+
         if (self.position.y > @as(f32, config.AREA_HEIGHT - self.size.y)) {
             self.position.y = -self.size.y;
         }

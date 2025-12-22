@@ -5,8 +5,8 @@ Game development practices with Zig programming language and [Raylib](https://gi
 ## Development Environment
 
 | **Operating System** | **Zig Version** | **Raylib Binding Version** |
-|------------------|-------------|------------------------|
-| Windows 11       | 0.15.1      | devel                  |
+|----------------------|-----------------|----------------------------|
+| Windows 11           | 0.15.1          | devel                      |
 
 ## Games
 
