@@ -6,6 +6,7 @@ const Mine = @import("mine.zig").Mine;
 const Player = @import("player.zig").Player;
 const Formations = @import("formation.zig").FORMATION;
 const AssetServer = @import("assetServer.zig").AssetServer;
+const Explosion = @import("explosion.zig").Explosion;
 
 pub const States = enum {
     Initial,
@@ -18,6 +19,7 @@ pub const Game = struct {
     player: Player,
     bots: [config.MAX_BOT_COUNT]Bot = undefined,
     mine: [config.MAX_MINE_COUNT]Mine = undefined,
+    explosions: [config.MAX_EXPLOSION_COUNT]Explosion = undefined,
     activeBotCount: usize = 0,
     state: States = .Initial,
     score: u32 = 0,
@@ -31,6 +33,7 @@ pub const Game = struct {
             .player = undefined,
             .bots = undefined,
             .mine = undefined,
+            .explosions = undefined,
             .activeBotCount = 0,
             .state = .Initial,
             .score = 0,
@@ -39,6 +42,11 @@ pub const Game = struct {
         };
         game.player = Player.init(assetServer);
         game.assetServer = assetServer;
+
+        for (game.explosions[0..]) |*e| {
+            e.* = Explosion.init(assetServer.explosionSheet);
+        }
+
         try game.loadFormation();
         try game.loadMines();
         return game;
@@ -67,6 +75,9 @@ pub const Game = struct {
         }
         for (self.mine[0..]) |*m| {
             m.*.isActive = false;
+        }
+        for (self.explosions[0..]) |*e| {
+            e.*.isActive = false;
         }
         _ = try self.loadFormation();
         _ = try self.loadMines();
@@ -113,8 +124,16 @@ pub const Game = struct {
                 .y = config.MINE_HEIGHT,
             };
             m.*.isActive = true;
-            // m.*.wakeUpTime = @floatFromInt(rl.getRandomValue(3, 8));
             m.*.maxLifetime = @floatFromInt(rl.getRandomValue(config.MINE_LIFETIME_RANGE[0], config.MINE_LIFETIME_RANGE[1]));
+        }
+    }
+
+    pub fn spawnExplosion(self: *@This(), x: f32, y: f32) void {
+        for (self.explosions[0..]) |*e| {
+            if (!e.isActive) {
+                e.spawn(x, y);
+                break;
+            }
         }
     }
 };

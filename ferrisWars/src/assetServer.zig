@@ -7,6 +7,7 @@ pub const AssetServer = struct {
     botBullet: rl.Texture2D = undefined,
     mine: rl.Texture2D = undefined,
     cover: rl.Texture2D = undefined,
+    explosionSheet: rl.Texture2D = undefined,
 
     pub fn load() !@This() {
         var assets = @This(){};
@@ -18,6 +19,7 @@ pub const AssetServer = struct {
         assets.botBullet = try rl.loadTexture("resources/botBullet.png");
         assets.mine = try rl.loadTexture("resources/mine.png");
         assets.cover = try rl.loadTexture("resources/cover.png");
+        assets.explosionSheet = try rl.loadTexture("resources/explosion_spriteSheet.png");
 
         return assets;
     }
@@ -31,5 +33,6 @@ pub const AssetServer = struct {
         rl.unloadTexture(self.mine);
         rl.unloadTexture(self.cover);
         rl.unloadTexture(self.botBullet);
+        rl.unloadTexture(self.explosionSheet);
     }
 };

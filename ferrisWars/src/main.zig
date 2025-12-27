@@ -73,6 +73,11 @@ pub fn main() !void {
                                 bot.isActive = false;
                                 game.score += 10;
                                 game.remainingBots -= 1;
+
+                                game.spawnExplosion(
+                                    bot.position.x + bot.size.x / 2 - 25,
+                                    bot.position.y + bot.size.y / 2 - 25,
+                                );
                             }
                         }
                     }
@@ -127,7 +132,6 @@ pub fn main() !void {
                 }
                 for (game.bots[0..game.activeBotCount]) |*bot| {
                     bot.draw();
-                    // Draw and update bot bullets
                     for (bot.bullets[0..]) |*b| {
                         b.update(deltaTime);
                         b.draw();
@@ -136,6 +140,11 @@ pub fn main() !void {
                 for (game.mine[0..]) |*m| {
                     m.update(deltaTime);
                     m.draw();
+                }
+
+                for (game.explosions[0..]) |*e| {
+                    e.update(deltaTime);
+                    e.draw();
                 }
             },
             .PlayerWin => {
