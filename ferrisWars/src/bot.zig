@@ -2,6 +2,7 @@ const rl = @import("raylib");
 const config = @import("config.zig").Config;
 const std = @import("std");
 const BotBullet = @import("botBullet.zig").BotBullet;
+const AssetServer = @import("assetServer.zig").AssetServer;
 
 pub const Bot = struct {
     position: rl.Vector2,
@@ -16,8 +17,9 @@ pub const Bot = struct {
     bullets: [config.MAX_BULLET_COUNT]BotBullet = undefined,
     playerLastPosition: rl.Vector2 = .{ .x = 0, .y = 0 },
 
-    pub fn init(texture: rl.Texture2D, bulletTexture: rl.Texture2D, startX: f32, startY: f32) @This() {
+    pub fn init(assetServer: AssetServer, startX: f32, startY: f32) @This() {
         // std.log.info("Creating Bot at position ({d}, {d})\n", .{ startX, startY });
+        const botId: usize = @intCast(rl.getRandomValue(0, assetServer.bots.len - 1));
         var bot: @This() =
             .{
                 .position = rl.Vector2{
@@ -29,14 +31,14 @@ pub const Bot = struct {
                     .x = config.BOT_WIDTH,
                     .y = config.BOT_HEIGHT,
                 },
-                .asset = texture,
+                .asset = assetServer.bots[botId],
                 .isActive = true,
             };
         bot.shootCooldown = @floatFromInt(rl.getRandomValue(3, 8));
         bot.shootTimer = bot.shootCooldown;
 
         for (bot.bullets[0..]) |*b| {
-            b.* = BotBullet.init(bulletTexture);
+            b.* = BotBullet.init(assetServer);
         }
         return bot;
     }

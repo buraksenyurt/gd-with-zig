@@ -1,5 +1,6 @@
 const rl = @import("raylib");
 const config = @import("config.zig").Config;
+const AssetServer = @import("assetServer.zig").AssetServer;
 
 pub const BotBullet = struct {
     position: rl.Vector2,
@@ -9,7 +10,7 @@ pub const BotBullet = struct {
     cooldown: f32 = 0.0,
     direction: f32 = -1.0,
 
-    pub fn init(texture: rl.Texture2D) @This() {
+    pub fn init(assetServer: AssetServer) @This() {
         return .{
             .position = rl.Vector2{
                 .x = 0,
@@ -20,7 +21,7 @@ pub const BotBullet = struct {
                 .y = config.BULLET_HEIGHT,
             },
             .isActive = false,
-            .asset = texture,
+            .asset = assetServer.botBullet,
         };
     }
 

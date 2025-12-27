@@ -28,7 +28,7 @@ pub const Player = struct {
                 .bulletAsset = assetServer.bullet,
             };
         for (p.bullets[0..]) |*b| {
-            b.* = Bullet.init(assetServer.bullet);
+            b.* = Bullet.init(assetServer);
         }
 
         return p;
@@ -80,8 +80,14 @@ pub const Player = struct {
     }
 
     pub fn draw(self: *@This()) void {
-        const x = @max(@min(self.position.x, @as(f32, @floatFromInt(std.math.maxInt(i32)))), @as(f32, @floatFromInt(std.math.minInt(i32))));
-        const y = @max(@min(self.position.y, @as(f32, @floatFromInt(std.math.maxInt(i32)))), @as(f32, @floatFromInt(std.math.minInt(i32))));
+        const x = @max(
+            @min(self.position.x, @as(f32, @floatFromInt(std.math.maxInt(i32)))),
+            @as(f32, @floatFromInt(std.math.minInt(i32))),
+        );
+        const y = @max(
+            @min(self.position.y, @as(f32, @floatFromInt(std.math.maxInt(i32)))),
+            @as(f32, @floatFromInt(std.math.minInt(i32))),
+        );
 
         rl.drawTexture(
             self.asset,

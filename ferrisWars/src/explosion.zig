@@ -1,5 +1,6 @@
 const rl = @import("raylib");
 const config = @import("config.zig").Config;
+const AssetServer = @import("assetServer.zig").AssetServer;
 
 pub const Explosion = struct {
     position: rl.Vector2,
@@ -18,11 +19,11 @@ pub const Explosion = struct {
         .{ .x = 295, .y = 1, .width = 96, .height = 96 },
     };
 
-    pub fn init(spriteSheet: rl.Texture2D) @This() {
+    pub fn init(assetServer: AssetServer) @This() {
         return .{
             .position = rl.Vector2{ .x = 0, .y = 0 },
             .isActive = false,
-            .spriteSheet = spriteSheet,
+            .spriteSheet = assetServer.explosion,
         };
     }
 

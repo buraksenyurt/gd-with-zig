@@ -13,7 +13,7 @@ pub const Mine = struct {
 
     pub fn update(self: *@This(), deltaTime: f32) void {
         if (!self.isActive) return;
-        self.currentLifetime += deltaTime; // Convert to milliseconds
+        self.currentLifetime += deltaTime;
         if (self.currentLifetime >= self.maxLifetime) {
             self.isActive = false;
         }

@@ -44,7 +44,7 @@ pub const Game = struct {
         game.assetServer = assetServer;
 
         for (game.explosions[0..]) |*e| {
-            e.* = Explosion.init(assetServer.explosionSheet);
+            e.* = Explosion.init(assetServer);
         }
 
         try game.loadFormation();
@@ -101,8 +101,7 @@ pub const Game = struct {
                 if (cell == Cell.Bot) {
                     const startX = offsetX + @as(f32, @floatFromInt((colIndex * @as(usize, config.BOT_WIDTH))));
                     const startY = offsetY + @as(f32, @floatFromInt((rowIndex * @as(usize, config.BOT_HEIGHT))));
-                    const botId: usize = @intCast(rl.getRandomValue(0, self.assetServer.bots.len - 1));
-                    const b = Bot.init(self.assetServer.bots[botId], self.assetServer.botBullet, startX, startY);
+                    const b = Bot.init(self.assetServer, startX, startY);
                     self.bots[counter] = b;
                     self.remainingBots += 1;
                     counter += 1;
