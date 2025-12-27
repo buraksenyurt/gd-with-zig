@@ -32,5 +32,7 @@ pub const Config = struct {
     pub const MINE_WIDTH: f32 = 36.0;
     pub const MINE_HEIGHT: f32 = 36.0;
     pub const MINE_LIFETIME_RANGE: [2]f32 = .{ 20.0, 100.0 };
+    pub const MINE_DISTANCE: f32 = 80.0;
+    pub const MINE_MAX_LOCATIONS_ATTEMPTS: usize = 50;
     pub const MAX_EXPLOSION_COUNT: usize = 10;
 };

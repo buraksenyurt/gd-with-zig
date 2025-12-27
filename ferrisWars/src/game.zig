@@ -112,18 +112,48 @@ pub const Game = struct {
     }
 
     fn loadMines(self: *@This()) !void {
-        for (self.mine[0..]) |*m| {
+        for (self.mine[0..], 0..) |*m, index| {
             m.*.asset = self.assetServer.mine;
-            m.*.position = rl.Vector2{
-                .x = @floatFromInt(rl.getRandomValue(0, config.SCREEN_WIDTH - config.MINE_WIDTH * 2)),
-                .y = @floatFromInt(rl.getRandomValue(config.MINE_HEIGHT * 2, config.AREA_HEIGHT / 2)),
-            };
             m.*.size = rl.Vector2{
                 .x = config.MINE_WIDTH,
                 .y = config.MINE_HEIGHT,
             };
+
+            var validPosition = false;
+            var attempts: usize = 0;
+
+            while (!validPosition and attempts < config.MINE_MAX_LOCATIONS_ATTEMPTS) {
+                const x = @as(f32, @floatFromInt(rl.getRandomValue(0, config.SCREEN_WIDTH - @as(i32, @intFromFloat(config.MINE_WIDTH * 2)))));
+                const y = @as(f32, @floatFromInt(rl.getRandomValue(@as(i32, @intFromFloat(config.MINE_HEIGHT * 2)), @as(i32, config.AREA_HEIGHT / 2))));
+
+                validPosition = true;
+                for (self.mine[0..index]) |other| {
+                    const dx = x - other.position.x;
+                    const dy = y - other.position.y;
+                    const distance = @sqrt(dx * dx + dy * dy);
+
+                    if (distance < config.MINE_DISTANCE) {
+                        validPosition = false;
+                        break;
+                    }
+                }
+
+                if (validPosition) {
+                    m.*.position = rl.Vector2{ .x = x, .y = y };
+                }
+
+                attempts += 1;
+            }
+
+            if (!validPosition) {
+                m.*.position = rl.Vector2{
+                    .x = @floatFromInt(rl.getRandomValue(0, config.SCREEN_WIDTH - @as(i32, @intFromFloat(config.MINE_WIDTH * 2)))),
+                    .y = @floatFromInt(rl.getRandomValue(@as(i32, @intFromFloat(config.MINE_HEIGHT * 2)), @as(i32, config.AREA_HEIGHT / 2))),
+                };
+            }
+
             m.*.isActive = true;
-            m.*.maxLifetime = @floatFromInt(rl.getRandomValue(config.MINE_LIFETIME_RANGE[0], config.MINE_LIFETIME_RANGE[1]));
+            m.*.maxLifetime = @floatFromInt(rl.getRandomValue(@as(i32, @intFromFloat(config.MINE_LIFETIME_RANGE[0])), @as(i32, @intFromFloat(config.MINE_LIFETIME_RANGE[1]))));
         }
     }
 
