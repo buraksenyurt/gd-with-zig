@@ -1,6 +1,7 @@
 const rl = @import("raylib");
 const config = @import("config.zig").Config;
 const std = @import("std");
+const BotBullet = @import("botBullet.zig").BotBullet;
 
 pub const Bot = struct {
     position: rl.Vector2,
@@ -8,22 +9,36 @@ pub const Bot = struct {
     size: rl.Vector2,
     asset: rl.Texture2D,
     isActive: bool = false,
+    shootTimer: f32 = 0.0,
+    shootCooldown: f32 = 2.0,
+    canShoot: bool = false,
+    bulletIndex: usize = 0,
+    bullets: [config.MAX_BULLET_COUNT]BotBullet = undefined,
+    playerLastPosition: rl.Vector2 = .{ .x = 0, .y = 0 },
 
-    pub fn init(texture: rl.Texture2D, startX: f32, startY: f32) @This() {
+    pub fn init(texture: rl.Texture2D, bulletTexture: rl.Texture2D, startX: f32, startY: f32) @This() {
         // std.log.info("Creating Bot at position ({d}, {d})\n", .{ startX, startY });
-        return .{
-            .position = rl.Vector2{
-                .x = startX,
-                .y = startY,
-            },
-            .initialX = startX,
-            .size = rl.Vector2{
-                .x = config.BOT_WIDTH,
-                .y = config.BOT_HEIGHT,
-            },
-            .asset = texture,
-            .isActive = true,
-        };
+        var bot: @This() =
+            .{
+                .position = rl.Vector2{
+                    .x = startX,
+                    .y = startY,
+                },
+                .initialX = startX,
+                .size = rl.Vector2{
+                    .x = config.BOT_WIDTH,
+                    .y = config.BOT_HEIGHT,
+                },
+                .asset = texture,
+                .isActive = true,
+            };
+        bot.shootCooldown = @floatFromInt(rl.getRandomValue(3, 8));
+        bot.shootTimer = bot.shootCooldown;
+
+        for (bot.bullets[0..]) |*b| {
+            b.* = BotBullet.init(bulletTexture);
+        }
+        return bot;
     }
 
     pub fn update(self: *@This(), deltaTime: f32) void {
@@ -40,6 +55,13 @@ pub const Bot = struct {
 
         if (self.position.y > @as(f32, config.AREA_HEIGHT - self.size.y)) {
             self.position.y = -self.size.y;
+        }
+
+        if (self.shootTimer > 0.0) {
+            self.shootTimer -= deltaTime;
+        } else {
+            self.canShoot = true;
+            self.shootTimer = self.shootCooldown;
         }
     }
 

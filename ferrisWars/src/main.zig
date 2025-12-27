@@ -80,9 +80,22 @@ pub fn main() !void {
 
                 for (game.bots[0..]) |*bot| {
                     if (bot.isActive) {
+                        bot.playerLastPosition = game.player.position;
+
                         if (rl.checkCollisionRecs(game.player.getRectangle(), bot.getRectangle())) {
                             game.state = .PlayerLoose;
                             continue :gameLoop;
+                        }
+                        if (bot.canShoot) {
+                            var bullet = &bot.bullets[bot.bulletIndex];
+                            if (!bullet.isActive) {
+                                bullet.position.x = bot.position.x + (bot.size.x / 2) - (bullet.size.x / 2);
+                                bullet.position.y = bot.position.y + bot.size.y;
+                                bullet.direction = -1.0;
+                                bullet.isActive = true;
+                                bot.bulletIndex = (bot.bulletIndex + 1) % config.MAX_BULLET_COUNT;
+                            }
+                            bot.canShoot = false;
                         }
                     }
                 }
@@ -97,10 +110,28 @@ pub fn main() !void {
                 }
 
                 for (game.bots[0..game.activeBotCount]) |*bot| {
+                    if (bot.isActive) {
+                        for (bot.bullets[0..]) |*bullet| {
+                            if (bullet.isActive) {
+                                if (rl.checkCollisionRecs(game.player.getRectangle(), bullet.getRectangle())) {
+                                    game.state = .PlayerLoose;
+                                    continue :gameLoop;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for (game.bots[0..game.activeBotCount]) |*bot| {
                     bot.update(deltaTime);
                 }
-                for (game.bots[0..game.activeBotCount]) |bot| {
+                for (game.bots[0..game.activeBotCount]) |*bot| {
                     bot.draw();
+                    // Draw and update bot bullets
+                    for (bot.bullets[0..]) |*b| {
+                        b.update(deltaTime);
+                        b.draw();
+                    }
                 }
                 for (game.mine[0..]) |*m| {
                     m.update(deltaTime);

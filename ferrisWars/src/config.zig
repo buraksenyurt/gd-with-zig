@@ -24,6 +24,7 @@ pub const Config = struct {
     pub const LOOSE_BACKGROUND_COLOR = rl.Color{ .r = 107, .g = 0, .b = 0, .a = 255 };
     pub const MAX_BULLET_COUNT: usize = 5;
     pub const BULLET_SPEED: f32 = 300.0;
+    pub const BOT_BULLET_SPEED: f32 = 150.0;
     pub const BULLET_WIDTH: f32 = 15.0;
     pub const BULLET_HEIGHT: f32 = 32.0;
     pub const BULLET_COOLDOWN: f32 = 0.3;
