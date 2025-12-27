@@ -18,7 +18,7 @@ pub const Bullet = struct {
                 .x = config.BULLET_WIDTH,
                 .y = config.BULLET_HEIGHT,
             },
-            .isActive = true,
+            .isActive = false,
             .asset = texture,
         };
     }
