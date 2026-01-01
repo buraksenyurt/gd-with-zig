@@ -14,6 +14,9 @@ pub fn main() !void {
     rl.initWindow(config.SCREEN_WIDTH, config.SCREEN_HEIGHT, "Ferris Wars Game in Zig with Raylib");
     defer rl.closeWindow();
 
+    rl.initAudioDevice();
+    defer rl.closeAudioDevice();
+
     rl.setTargetFPS(config.FPS);
 
     const assetServer = try AssetServer.load();
@@ -28,6 +31,10 @@ pub fn main() !void {
 
         rl.beginDrawing();
         defer rl.endDrawing();
+
+        if (!rl.isSoundPlaying(assetServer.levelMusic)) {
+            rl.playSound(assetServer.levelMusic);
+        }
 
         rl.clearBackground(config.BACKGROUND_COLOR);
 
@@ -78,6 +85,7 @@ pub fn main() !void {
                                     bot.position.x + bot.size.x / 2 - 25,
                                     bot.position.y + bot.size.y / 2 - 25,
                                 );
+                                rl.playSound(assetServer.explosionSound);
                             }
                         }
                     }
@@ -150,6 +158,13 @@ pub fn main() !void {
             .PlayerWin => {
                 rl.clearBackground(config.WIN_BACKGROUND_COLOR);
                 Designer.playerWinText.draw(TextAlignment.Center, .{});
+                if (!rl.isSoundPlaying(assetServer.winningSound) and !game.winningSoundPlayed) {
+                    rl.playSound(assetServer.winningSound);
+                    game.winningSoundPlayed = true;
+                }
+                if (rl.isSoundPlaying(assetServer.levelMusic)) {
+                    rl.stopSound(assetServer.levelMusic);
+                }
                 if (rl.isKeyPressed(rl.KeyboardKey.r)) {
                     try game.reset();
                     continue :gameLoop;
@@ -158,7 +173,13 @@ pub fn main() !void {
             .PlayerLoose => {
                 rl.clearBackground(config.LOOSE_BACKGROUND_COLOR);
                 Designer.gameOverText.draw(TextAlignment.Center, .{});
-
+                if (!rl.isSoundPlaying(assetServer.losingSound) and !game.losingSoundPlayed) {
+                    rl.playSound(assetServer.losingSound);
+                    game.losingSoundPlayed = true;
+                }
+                if (rl.isSoundPlaying(assetServer.levelMusic)) {
+                    rl.stopSound(assetServer.levelMusic);
+                }
                 if (rl.isKeyPressed(rl.KeyboardKey.r)) {
                     try game.reset();
                     continue :gameLoop;

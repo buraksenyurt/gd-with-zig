@@ -7,11 +7,10 @@ const AssetServer = @import("assetServer.zig").AssetServer;
 pub const Player = struct {
     position: rl.Vector2,
     size: rl.Vector2,
-    asset: rl.Texture2D,
-    bulletAsset: rl.Texture2D,
     bullets: [config.MAX_BULLET_COUNT]Bullet = undefined,
     bulletCooldown: f32 = 0.0,
     totalBulletsFired: u32 = 0,
+    assetServer: AssetServer,
 
     pub fn init(assetServer: AssetServer) @This() {
         var p: Player =
@@ -24,8 +23,7 @@ pub const Player = struct {
                     .x = config.PLAYER_WIDTH,
                     .y = config.PLAYER_HEIGHT,
                 },
-                .asset = assetServer.player,
-                .bulletAsset = assetServer.bullet,
+                .assetServer = assetServer,
             };
         for (p.bullets[0..]) |*b| {
             b.* = Bullet.init(assetServer);
@@ -70,6 +68,11 @@ pub const Player = struct {
                     b.isActive = true;
                     self.bulletCooldown = config.BULLET_COOLDOWN;
                     self.totalBulletsFired += 1;
+
+                    if (!rl.isSoundPlaying(self.assetServer.shootingSound)) {
+                        rl.playSound(self.assetServer.shootingSound);
+                    }
+
                     break;
                 }
             }
@@ -90,7 +93,7 @@ pub const Player = struct {
         );
 
         rl.drawTexture(
-            self.asset,
+            self.assetServer.player,
             @intFromFloat(x),
             @intFromFloat(y),
             rl.Color.white,

@@ -8,18 +8,28 @@ pub const AssetServer = struct {
     mine: rl.Texture2D = undefined,
     cover: rl.Texture2D = undefined,
     explosionSheet: rl.Texture2D = undefined,
+    winningSound: rl.Sound = undefined,
+    losingSound: rl.Sound = undefined,
+    explosionSound: rl.Sound = undefined,
+    levelMusic: rl.Sound = undefined,
+    shootingSound: rl.Sound = undefined,
 
     pub fn load() !@This() {
         var assets = @This(){};
-        assets.player = try rl.loadTexture("resources/hero.png");
-        assets.bots[0] = try rl.loadTexture("resources/bot_1.png");
-        assets.bots[1] = try rl.loadTexture("resources/bot_2.png");
-        assets.bots[2] = try rl.loadTexture("resources/bot_3.png");
-        assets.bullet = try rl.loadTexture("resources/rocket.png");
-        assets.botBullet = try rl.loadTexture("resources/botBullet.png");
-        assets.mine = try rl.loadTexture("resources/mine.png");
-        assets.cover = try rl.loadTexture("resources/cover.png");
-        assets.explosionSheet = try rl.loadTexture("resources/explosion_spriteSheet.png");
+        assets.player = try rl.loadTexture("resources/asset/hero.png");
+        assets.bots[0] = try rl.loadTexture("resources/asset/bot_1.png");
+        assets.bots[1] = try rl.loadTexture("resources/asset/bot_2.png");
+        assets.bots[2] = try rl.loadTexture("resources/asset/bot_3.png");
+        assets.bullet = try rl.loadTexture("resources/asset/rocket.png");
+        assets.botBullet = try rl.loadTexture("resources/asset/botBullet.png");
+        assets.mine = try rl.loadTexture("resources/asset/mine.png");
+        assets.cover = try rl.loadTexture("resources/asset/cover.png");
+        assets.explosionSheet = try rl.loadTexture("resources/asset/explosion_spriteSheet.png");
+        assets.winningSound = try rl.loadSound("resources/audio/winning.wav");
+        assets.losingSound = try rl.loadSound("resources/audio/losing.wav");
+        assets.explosionSound = try rl.loadSound("resources/audio/explosion.wav");
+        assets.levelMusic = try rl.loadSound("resources/audio/levelMusic.wav");
+        assets.shootingSound = try rl.loadSound("resources/audio/shooting.wav");
 
         return assets;
     }
@@ -34,5 +44,10 @@ pub const AssetServer = struct {
         rl.unloadTexture(self.cover);
         rl.unloadTexture(self.botBullet);
         rl.unloadTexture(self.explosionSheet);
+        rl.unloadSound(self.winningSound);
+        rl.unloadSound(self.losingSound);
+        rl.unloadSound(self.explosionSound);
+        rl.unloadSound(self.levelMusic);
+        rl.unloadSound(self.shootingSound);
     }
 };

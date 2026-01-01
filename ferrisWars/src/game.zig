@@ -25,6 +25,8 @@ pub const Game = struct {
     score: u32 = 0,
     remainingBots: usize = 0,
     assetServer: AssetServer,
+    winningSoundPlayed: bool = false,
+    losingSoundPlayed: bool = false,
 
     pub fn init(
         assetServer: AssetServer,
@@ -59,6 +61,8 @@ pub const Game = struct {
         self.remainingBots = 0;
         self.player.bulletCooldown = 0.0;
         self.player.totalBulletsFired = 0;
+        self.losingSoundPlayed = false;
+        self.winningSoundPlayed = false;
         self.player.position = rl.Vector2{
             .x = config.SCREEN_WIDTH / 2 - config.PLAYER_WIDTH / 2,
             .y = config.AREA_HEIGHT - config.PLAYER_HEIGHT,
