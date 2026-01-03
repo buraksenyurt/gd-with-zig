@@ -9,6 +9,7 @@ pub const AssetServer = struct {
     cover: rl.Texture2D = undefined,
     explosionSheet: rl.Texture2D = undefined,
     microControllerAnimation: rl.Texture2D = undefined,
+    jumperAnimation: rl.Texture2D = undefined,
     winningSound: rl.Sound = undefined,
     losingSound: rl.Sound = undefined,
     explosionSound: rl.Sound = undefined,
@@ -27,9 +28,11 @@ pub const AssetServer = struct {
         assets.botBullet = try rl.loadTexture("resources/asset/botBullet.png");
         assets.mine = try rl.loadTexture("resources/asset/mine.png");
         assets.cover = try rl.loadTexture("resources/asset/cover.png");
+
+        // Sprite Sheets
         assets.explosionSheet = try rl.loadTexture("resources/asset/explosion_spriteSheet.png");
         assets.microControllerAnimation = try rl.loadTexture("resources/asset/micro_spriteSheet.png");
-
+        assets.jumperAnimation = try rl.loadTexture("resources/asset/jumper_spriteSheet.png");
         // Sounds
         assets.winningSound = try rl.loadSound("resources/audio/winning.wav");
         assets.losingSound = try rl.loadSound("resources/audio/losing.wav");
@@ -51,6 +54,7 @@ pub const AssetServer = struct {
         rl.unloadTexture(self.botBullet);
         rl.unloadTexture(self.explosionSheet);
         rl.unloadTexture(self.microControllerAnimation);
+        rl.unloadTexture(self.jumperAnimation);
 
         rl.unloadSound(self.winningSound);
         rl.unloadSound(self.losingSound);

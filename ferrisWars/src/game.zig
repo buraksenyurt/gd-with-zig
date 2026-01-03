@@ -8,6 +8,8 @@ const Formations = @import("formation.zig").FORMATION;
 const AssetServer = @import("assetServer.zig").AssetServer;
 const Explosion = @import("animations.zig").ExplosionAnimation;
 const MineAnimation = @import("animations.zig").MineAnimation;
+const Jumper = @import("jumper.zig").Jumper;
+const JumperAnimation = @import("animations.zig").JumperAnimation;
 
 pub const States = enum {
     Initial,
@@ -19,7 +21,8 @@ pub const States = enum {
 pub const Game = struct {
     player: Player,
     bots: [config.MAX_BOT_COUNT]Bot = undefined,
-    mine: [config.MAX_MINE_COUNT]Mine = undefined,
+    mines: [config.MAX_MINE_COUNT]Mine = undefined,
+    jumper: Jumper,
     explosions: [config.MAX_EXPLOSION_COUNT]Explosion = undefined,
     activeBotCount: usize = 0,
     state: States = .Initial,
@@ -34,8 +37,9 @@ pub const Game = struct {
     ) !@This() {
         var game = @This(){
             .player = undefined,
+            .jumper = undefined,
             .bots = undefined,
-            .mine = undefined,
+            .mines = undefined,
             .explosions = undefined,
             .activeBotCount = 0,
             .state = .Initial,
@@ -52,6 +56,8 @@ pub const Game = struct {
 
         try game.loadFormation();
         try game.loadMines();
+        try game.loadJumper();
+
         return game;
     }
 
@@ -78,7 +84,7 @@ pub const Game = struct {
         for (self.bots[0..]) |*bot| {
             bot.*.isActive = false;
         }
-        for (self.mine[0..]) |*m| {
+        for (self.mines[0..]) |*m| {
             m.*.isActive = false;
         }
         for (self.explosions[0..]) |*e| {
@@ -117,7 +123,7 @@ pub const Game = struct {
     }
 
     fn loadMines(self: *@This()) !void {
-        for (self.mine[0..], 0..) |*m, index| {
+        for (self.mines[0..], 0..) |*m, index| {
             m.*.animation = MineAnimation.init(self.assetServer);
             m.*.size = rl.Vector2{
                 .x = config.MINE_WIDTH,
@@ -132,7 +138,7 @@ pub const Game = struct {
                 const y = @as(f32, @floatFromInt(rl.getRandomValue(@as(i32, @intFromFloat(config.MINE_HEIGHT * 2)), @as(i32, config.AREA_HEIGHT / 2))));
 
                 validPosition = true;
-                for (self.mine[0..index]) |other| {
+                for (self.mines[0..index]) |other| {
                     const dx = x - other.position.x;
                     const dy = y - other.position.y;
                     const distance = @sqrt(dx * dx + dy * dy);
@@ -161,6 +167,14 @@ pub const Game = struct {
             m.*.animation.spawn(m.position.x, m.position.y);
             m.*.maxLifetime = @floatFromInt(rl.getRandomValue(@as(i32, @intFromFloat(config.MINE_LIFETIME_RANGE[0])), @as(i32, @intFromFloat(config.MINE_LIFETIME_RANGE[1]))));
         }
+    }
+
+    pub fn loadJumper(self: *@This()) !void {
+        self.jumper.isActive = true;
+        self.jumper.position = rl.Vector2{ .x = 100, .y = 100 };
+        self.jumper.animation.isActive = true;
+        self.jumper.animation = JumperAnimation.init(self.assetServer);
+        self.jumper.animation.spawn(100, 100);
     }
 
     pub fn spawnExplosion(self: *@This(), x: f32, y: f32) void {

@@ -72,6 +72,9 @@ pub fn main() !void {
                 game.player.update(deltaTime);
                 game.player.draw();
 
+                game.jumper.update(deltaTime);
+                game.jumper.draw();
+
                 for (game.player.bullets[0..]) |*b| {
                     for (game.bots[0..game.activeBotCount]) |*bot| {
                         if (b.isActive and bot.isActive) {
@@ -113,7 +116,7 @@ pub fn main() !void {
                     }
                 }
 
-                for (game.mine[0..]) |*m| {
+                for (game.mines[0..]) |*m| {
                     if (m.isActive) {
                         if (rl.checkCollisionRecs(game.player.getRectangle(), m.getRectangle())) {
                             game.state = .PlayerLoose;
@@ -145,7 +148,7 @@ pub fn main() !void {
                         b.draw();
                     }
                 }
-                for (game.mine[0..]) |*m| {
+                for (game.mines[0..]) |*m| {
                     m.update(deltaTime);
                     m.draw();
                 }

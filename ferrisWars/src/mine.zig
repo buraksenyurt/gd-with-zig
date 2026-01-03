@@ -29,7 +29,7 @@ pub const Mine = struct {
         self.animation.draw();
     }
 
-    pub fn getRectangle(self: *const Mine) rl.Rectangle {
+    pub fn getRectangle(self: *const @This()) rl.Rectangle {
         return rl.Rectangle{
             .x = self.position.x,
             .y = self.position.y,
