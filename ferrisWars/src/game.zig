@@ -92,6 +92,7 @@ pub const Game = struct {
         }
         _ = try self.loadFormation();
         _ = try self.loadMines();
+        _ = try self.loadJumper();
     }
 
     fn getRandomFormation() [config.FORMATION_ROW_COUNT][config.FORMATION_COL_COUNT]Cell {
@@ -172,6 +173,8 @@ pub const Game = struct {
     pub fn loadJumper(self: *@This()) !void {
         self.jumper.isActive = true;
         self.jumper.position = rl.Vector2{ .x = 100, .y = 100 };
+        self.jumper.size = rl.Vector2{ .x = 64, .y = 64 };
+        self.jumper.direction = rl.Vector2{ .x = 1.0, .y = 1.0 };
         self.jumper.animation.isActive = true;
         self.jumper.animation = JumperAnimation.init(self.assetServer);
         self.jumper.animation.spawn(100, 100);

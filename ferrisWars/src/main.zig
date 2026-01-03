@@ -72,9 +72,6 @@ pub fn main() !void {
                 game.player.update(deltaTime);
                 game.player.draw();
 
-                game.jumper.update(deltaTime);
-                game.jumper.draw();
-
                 for (game.player.bullets[0..]) |*b| {
                     for (game.bots[0..game.activeBotCount]) |*bot| {
                         if (b.isActive and bot.isActive) {
@@ -157,6 +154,10 @@ pub fn main() !void {
                     e.update(deltaTime);
                     e.draw();
                 }
+
+                game.jumper.update(deltaTime);
+                game.jumper.move(60 * deltaTime, 30 * deltaTime);
+                game.jumper.draw();
             },
             .PlayerWin => {
                 rl.clearBackground(config.WIN_BACKGROUND_COLOR);

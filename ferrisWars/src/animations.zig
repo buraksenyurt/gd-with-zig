@@ -167,7 +167,7 @@ pub const JumperAnimation = struct {
         return .{
             .position = rl.Vector2{ .x = 0, .y = 0 },
             .isActive = false,
-            .spriteSheet = assetServer.microControllerAnimation,
+            .spriteSheet = assetServer.jumperAnimation,
         };
     }
 
