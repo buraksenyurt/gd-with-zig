@@ -1,11 +1,13 @@
 const rl = @import("raylib");
 const config = @import("config.zig").Config;
 const std = @import("std");
+const MineAnimation = @import("animations.zig").MineAnimation;
+const AssetServer = @import("assetServer.zig").AssetServer;
 
 pub const Mine = struct {
     position: rl.Vector2,
     size: rl.Vector2,
-    asset: rl.Texture2D,
+    animation: MineAnimation,
     isActive: bool = false,
     currentLifetime: f32 = 0.0,
     maxLifetime: f32 = 0.0,
@@ -16,17 +18,15 @@ pub const Mine = struct {
         self.currentLifetime += deltaTime;
         if (self.currentLifetime >= self.maxLifetime) {
             self.isActive = false;
+            self.animation.isActive = false;
+            return;
         }
+        if (self.animation.isActive) self.animation.update(deltaTime);
     }
 
     pub fn draw(self: @This()) void {
         if (!self.isActive) return;
-        rl.drawTexture(
-            self.asset,
-            @intFromFloat(self.position.x),
-            @intFromFloat(self.position.y),
-            rl.Color.white,
-        );
+        self.animation.draw();
     }
 
     pub fn getRectangle(self: *const Mine) rl.Rectangle {

@@ -6,7 +6,8 @@ const Mine = @import("mine.zig").Mine;
 const Player = @import("player.zig").Player;
 const Formations = @import("formation.zig").FORMATION;
 const AssetServer = @import("assetServer.zig").AssetServer;
-const Explosion = @import("explosion.zig").Explosion;
+const Explosion = @import("animations.zig").ExplosionAnimation;
+const MineAnimation = @import("animations.zig").MineAnimation;
 
 pub const States = enum {
     Initial,
@@ -87,7 +88,7 @@ pub const Game = struct {
         _ = try self.loadMines();
     }
 
-    fn getRandomFormation() [config.F_ROW_COUNT][config.F_COL_COUNT]Cell {
+    fn getRandomFormation() [config.FORMATION_ROW_COUNT][config.FORMATION_COL_COUNT]Cell {
         const randIndex = @as(usize, @intCast(rl.getRandomValue(0, Formations.len - 1)));
         // std.log.info("Selected Formation Index: {d}\n", .{randIndex});
         return Formations[randIndex];
@@ -95,7 +96,7 @@ pub const Game = struct {
 
     fn loadFormation(self: *@This()) !void {
         const formation = getRandomFormation();
-        const formationWidth: f32 = config.F_COL_COUNT * config.BOT_WIDTH;
+        const formationWidth: f32 = config.FORMATION_COL_COUNT * config.BOT_WIDTH;
         const offsetX: f32 = (@as(f32, @floatFromInt(config.SCREEN_WIDTH)) - formationWidth) / 2.0;
         const offsetY: f32 = config.FORMATION_START_Y;
 
@@ -117,7 +118,7 @@ pub const Game = struct {
 
     fn loadMines(self: *@This()) !void {
         for (self.mine[0..], 0..) |*m, index| {
-            m.*.asset = self.assetServer.mine;
+            m.*.animation = MineAnimation.init(self.assetServer);
             m.*.size = rl.Vector2{
                 .x = config.MINE_WIDTH,
                 .y = config.MINE_HEIGHT,
@@ -157,6 +158,7 @@ pub const Game = struct {
             }
 
             m.*.isActive = true;
+            m.*.animation.spawn(m.position.x, m.position.y);
             m.*.maxLifetime = @floatFromInt(rl.getRandomValue(@as(i32, @intFromFloat(config.MINE_LIFETIME_RANGE[0])), @as(i32, @intFromFloat(config.MINE_LIFETIME_RANGE[1]))));
         }
     }

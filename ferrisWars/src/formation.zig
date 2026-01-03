@@ -5,7 +5,7 @@ pub const Cell = enum(u8) {
     Bot = 1,
 };
 
-pub const FORMATION = [_][config.F_ROW_COUNT][config.F_COL_COUNT]Cell{
+pub const FORMATION = [_][config.FORMATION_ROW_COUNT][config.FORMATION_COL_COUNT]Cell{
     .{
         .{ .Bot, .Empty, .Empty, .Empty, .Bot },
         .{ .Bot, .Empty, .Empty, .Empty, .Bot },
