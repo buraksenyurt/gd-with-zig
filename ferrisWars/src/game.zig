@@ -27,6 +27,7 @@ pub const Game = struct {
     activeBotCount: usize = 0,
     state: States = .Initial,
     score: u32 = 0,
+    elapsedTime: f32 = 0.0,
     remainingBots: usize = 0,
     assetServer: AssetServer,
     winningSoundPlayed: bool = false,
@@ -45,6 +46,7 @@ pub const Game = struct {
             .state = .Initial,
             .score = 0,
             .remainingBots = 0,
+            .elapsedTime = 0.0,
             .assetServer = undefined,
         };
         game.player = Player.init(assetServer);
@@ -70,6 +72,7 @@ pub const Game = struct {
         self.player.totalBulletsFired = 0;
         self.losingSoundPlayed = false;
         self.winningSoundPlayed = false;
+        self.elapsedTime = 0.0;
         self.player.position = rl.Vector2{
             .x = config.SCREEN_WIDTH / 2 - config.PLAYER_WIDTH / 2,
             .y = config.AREA_HEIGHT - config.PLAYER_HEIGHT,

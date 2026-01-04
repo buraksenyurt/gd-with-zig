@@ -27,11 +27,11 @@ pub const playerWinText = TextBlock{
 };
 
 pub const hudText = TextBlock{
-    .text = "Score: %d Remaining: %d Bullets: %d",
+    .text = "Score: %d Remaining: %d Bullets: %d Elapsed Time: %d s",
     .position = rl.Vector2{
         .x = 10.0,
         .y = @as(f32, config.AREA_HEIGHT) + 10.0,
     },
-    .fontSize = config.TITLE_FONT_SIZE,
+    .fontSize = config.HUD_FONT_SIZE,
     .color = config.HUD_FONT_COLOR,
 };

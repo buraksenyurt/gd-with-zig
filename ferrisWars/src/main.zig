@@ -47,7 +47,12 @@ pub fn main() !void {
         );
         Designer.hudText.draw(
             .Left,
-            .{ game.score, game.remainingBots, game.player.totalBulletsFired },
+            .{
+                game.score,
+                game.remainingBots,
+                game.player.totalBulletsFired,
+                @as(i32, @intFromFloat(game.elapsedTime)),
+            },
         );
 
         switch (game.state) {
@@ -158,6 +163,7 @@ pub fn main() !void {
                 game.jumper.update(deltaTime);
                 game.jumper.move(60 * deltaTime, 30 * deltaTime);
                 game.jumper.draw();
+                game.elapsedTime += deltaTime;
             },
             .PlayerWin => {
                 rl.clearBackground(config.WIN_BACKGROUND_COLOR);
