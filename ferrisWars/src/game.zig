@@ -28,6 +28,7 @@ pub const Game = struct {
     jumper: Jumper,
     explosions: [config.MAX_EXPLOSION_COUNT]Explosion = undefined,
     activeBotCount: usize = 0,
+    totalBotCount: u32 = 0,
     state: States = .Initial,
     playerScores: [10]PlayerScore = undefined,
     currentScore: u32 = 0,
@@ -72,6 +73,7 @@ pub const Game = struct {
         self.state = .Initial;
         self.currentScore = 0;
         self.activeBotCount = 0;
+        self.totalBotCount = 0;
         self.remainingBots = 0;
         self.player.bulletCooldown = 0.0;
         self.player.totalBulletsFired = 0;
@@ -129,6 +131,7 @@ pub const Game = struct {
             }
         }
         self.activeBotCount = counter;
+        self.totalBotCount = @as(u32, @intCast(counter));
     }
 
     fn loadChips(self: *@This()) !void {
@@ -198,11 +201,8 @@ pub const Game = struct {
     }
 
     pub fn calculateScore(self: *@This()) u32 {
-        const timeBonusScore = @as(u32, @intFromFloat(self.elapsedTime * 10));
+        const baseScore: f32 = @as(f32, @floatFromInt(self.totalBotCount)) / 1.5;
+        const timeBonusScore = @as(u32, @intFromFloat((self.elapsedTime * config.BOT_POINT_VALUE) + baseScore));
         return timeBonusScore;
     }
-
-    // pub fn saveCurrentScore(self: *@This(), playerId: u8) !void {
-
-    // }
 };

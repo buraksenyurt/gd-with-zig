@@ -1,13 +1,11 @@
 const std = @import("std");
 
 pub const PlayerScore = struct {
-    id: u8,
-    time: u64,
+    time: f32,
     score: u64,
 
-    pub fn init(id: u8, time: u64, score: u64) @This() {
+    pub fn init(time: f32, score: u64) @This() {
         return .{
-            .id = id,
             .time = time,
             .score = score,
         };
@@ -36,17 +34,16 @@ pub fn loadPlayerScores() ![10]PlayerScore {
         if (lineString.len == 0) continue;
 
         var fields = std.mem.splitScalar(u8, lineString, ',');
-        const idField = fields.next();
         const elapsedTimeField = fields.next();
         const scoreField = fields.next();
 
         if (elapsedTimeField) |t_str| {
             if (scoreField) |s_str| {
-                const id = std.fmt.parseInt(u8, std.mem.trim(u8, idField orelse "", &std.ascii.whitespace), 10) catch continue;
-                const time = std.fmt.parseInt(u64, std.mem.trim(u8, t_str, &std.ascii.whitespace), 10) catch continue;
+                const timeStr = std.mem.trim(u8, t_str, &std.ascii.whitespace);
+                const time = std.fmt.parseFloat(f32, timeStr) catch continue;
                 const score = std.fmt.parseInt(u64, std.mem.trim(u8, s_str, &std.ascii.whitespace), 10) catch continue;
 
-                scores[i] = PlayerScore.init(id, time, score);
+                scores[i] = PlayerScore.init(time, score);
                 if (i >= 9) break;
             }
         }
@@ -65,7 +62,7 @@ pub fn savePlayerScores(scores: []PlayerScore) !void {
     defer file.close();
 
     for (scores) |s| {
-        const line = try std.fmt.allocPrint(std.heap.page_allocator, "{},{},{}\n", .{ s.id, s.time, s.score });
+        const line = try std.fmt.allocPrint(std.heap.page_allocator, "{},{}\n", .{ s.time, s.score });
         defer std.heap.page_allocator.free(line);
 
         try file.writeAll(line);

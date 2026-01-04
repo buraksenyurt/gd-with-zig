@@ -25,6 +25,7 @@ pub const Config = struct {
     pub const BOT_HORIZONTAL_SPEED: f32 = 40.0;
     pub const MAX_BOT_COUNT: usize = 20;
     pub const BOT_BULLET_SPEED: f32 = 150.0;
+    pub const BOT_POINT_VALUE: f32 = 9.80;
 
     // Bot Formation
     pub const FORMATION_ROW_COUNT: usize = 4;

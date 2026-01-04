@@ -183,7 +183,7 @@ pub fn main() !void {
                     try game.reset();
                     continue :gameLoop;
                 }
-                const playerScore = PlayerScore.init(1, @intFromFloat(game.elapsedTime), game.calculateScore());
+                const playerScore = PlayerScore.init(game.elapsedTime, game.calculateScore());
                 game.playerScores[0] = playerScore;
                 try Data.savePlayerScores(&game.playerScores);
             },
