@@ -198,9 +198,13 @@ pub const Game = struct {
     }
 
     pub fn calculateScore(self: *@This()) u32 {
-        const bulletsFiredPenalty = @as(f32, @floatFromInt(self.player.totalBulletsFired)) * 1.5;
-        const baseScore: f32 = @as(f32, @floatFromInt(self.totalBotCount)) / 1.0;
-        const timeBonusScore = @as(u32, @intFromFloat(((self.currentScore.elapsedTime * config.BOT_POINT_VALUE) - baseScore) + bulletsFiredPenalty));
-        return timeBonusScore;
+        const baseScore: f32 = @as(f32, @floatFromInt(self.totalBotCount)) * 100.0;
+        const timePenalty = self.currentScore.elapsedTime * 50.0;
+        const timeBonus: f32 = @max(0.0, 1000.0 - timePenalty);
+        const extraBullets = @as(f32, @floatFromInt(self.player.totalBulletsFired)) - @as(f32, @floatFromInt(self.totalBotCount));
+        const accuracyPenalty = extraBullets * 10.0;
+        const accuracyBonus: f32 = @max(0.0, 500.0 - accuracyPenalty);
+
+        return @as(u32, @intFromFloat(baseScore + timeBonus + accuracyBonus));
     }
 };

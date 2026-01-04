@@ -52,8 +52,9 @@ pub fn main() !void {
         Designer.hudText.draw(
             .Left,
             .{
-                game.currentScore.score,
+                game.totalBotCount,
                 game.remainingBots,
+                game.currentScore.score,
                 game.player.totalBulletsFired,
                 @as(i32, @intFromFloat(game.currentScore.elapsedTime)),
             },

@@ -27,7 +27,7 @@ pub const playerWinText = TextBlock{
 };
 
 pub const hudText = TextBlock{
-    .text = "Score: %d Remaining: %d Bullets: %d Elapsed Time: %d s",
+    .text = "Bots: %d/%d Hit: %d Bullets: %d Time: %d s",
     .position = rl.Vector2{
         .x = 10.0,
         .y = @as(f32, config.AREA_HEIGHT) + 10.0,

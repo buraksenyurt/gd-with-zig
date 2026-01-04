@@ -61,7 +61,7 @@ pub fn savePlayerScore(bestScore: PlayerScore) !void {
 }
 
 pub fn updateBestScore(bestScore: *PlayerScore, newScore: PlayerScore) void {
-    if (bestScore.score == 0 or newScore.score < bestScore.score) {
+    if (bestScore.score == 0 or newScore.score > bestScore.score) {
         bestScore.* = newScore;
     }
 }
