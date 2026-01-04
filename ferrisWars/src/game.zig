@@ -30,9 +30,8 @@ pub const Game = struct {
     activeBotCount: usize = 0,
     totalBotCount: u32 = 0,
     state: States = .Initial,
-    playerScores: [10]PlayerScore = undefined,
-    currentScore: u32 = 0,
-    elapsedTime: f32 = 0.0,
+    bestScore: PlayerScore = undefined,
+    currentScore: PlayerScore = undefined,
     remainingBots: usize = 0,
     assetServer: AssetServer,
     winningSoundPlayed: bool = false,
@@ -46,13 +45,12 @@ pub const Game = struct {
             .jumper = undefined,
             .bots = undefined,
             .chips = undefined,
-            .playerScores = undefined,
+            .bestScore = undefined,
             .explosions = undefined,
             .activeBotCount = 0,
             .state = .Initial,
-            .currentScore = 0,
+            .currentScore = PlayerScore.init(0.0, 0),
             .remainingBots = 0,
-            .elapsedTime = 0.0,
             .assetServer = undefined,
         };
         game.player = Player.init(assetServer);
@@ -71,7 +69,6 @@ pub const Game = struct {
 
     pub fn reset(self: *@This()) !void {
         self.state = .Initial;
-        self.currentScore = 0;
         self.activeBotCount = 0;
         self.totalBotCount = 0;
         self.remainingBots = 0;
@@ -79,7 +76,7 @@ pub const Game = struct {
         self.player.totalBulletsFired = 0;
         self.losingSoundPlayed = false;
         self.winningSoundPlayed = false;
-        self.elapsedTime = 0.0;
+        self.currentScore = PlayerScore.init(0.0, 0);
         self.player.position = rl.Vector2{
             .x = config.SCREEN_WIDTH / 2 - config.PLAYER_WIDTH / 2,
             .y = config.AREA_HEIGHT - config.PLAYER_HEIGHT,
@@ -201,8 +198,9 @@ pub const Game = struct {
     }
 
     pub fn calculateScore(self: *@This()) u32 {
-        const baseScore: f32 = @as(f32, @floatFromInt(self.totalBotCount)) / 1.5;
-        const timeBonusScore = @as(u32, @intFromFloat((self.elapsedTime * config.BOT_POINT_VALUE) + baseScore));
+        const bulletsFiredPenalty = @as(f32, @floatFromInt(self.player.totalBulletsFired)) * 1.5;
+        const baseScore: f32 = @as(f32, @floatFromInt(self.totalBotCount)) / 1.0;
+        const timeBonusScore = @as(u32, @intFromFloat(((self.currentScore.elapsedTime * config.BOT_POINT_VALUE) - baseScore) + bulletsFiredPenalty));
         return timeBonusScore;
     }
 };
