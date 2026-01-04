@@ -41,13 +41,13 @@ pub const Config = struct {
     pub const BULLET_HEIGHT: f32 = 32.0;
     pub const BULLET_COOLDOWN: f32 = 0.3;
 
-    // Mines
-    pub const MAX_MINE_COUNT: usize = 8;
-    pub const MINE_WIDTH: f32 = 36.0;
-    pub const MINE_HEIGHT: f32 = 36.0;
-    pub const MINE_LIFETIME_RANGE: [2]f32 = .{ 10.0, 25.0 };
-    pub const MINE_DISTANCE: f32 = 80.0;
-    pub const MINE_MAX_LOCATIONS_ATTEMPTS: usize = 50;
+    // Chips
+    pub const MAX_CHIP_COUNT: usize = 8;
+    pub const CHIP_WIDTH: f32 = 36.0;
+    pub const CHIP_HEIGHT: f32 = 36.0;
+    pub const CHIP_LIFETIME_RANGE: [2]f32 = .{ 10.0, 25.0 };
+    pub const CHIP_DISTANCE: f32 = 80.0;
+    pub const CHIP_MAX_LOCATIONS_ATTEMPTS: usize = 50;
 
     // Explosions
     pub const MAX_EXPLOSION_COUNT: usize = 10;

@@ -1,13 +1,13 @@
 const rl = @import("raylib");
 const config = @import("config.zig").Config;
 const std = @import("std");
-const MineAnimation = @import("animations.zig").MineAnimation;
+const ChipAnimation = @import("animations.zig").ChipAnimation;
 const AssetServer = @import("assetServer.zig").AssetServer;
 
-pub const Mine = struct {
+pub const Chip = struct {
     position: rl.Vector2,
     size: rl.Vector2,
-    animation: MineAnimation,
+    animation: ChipAnimation,
     isActive: bool = false,
     currentLifetime: f32 = 0.0,
     maxLifetime: f32 = 0.0,

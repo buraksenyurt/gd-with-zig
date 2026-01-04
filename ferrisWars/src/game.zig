@@ -2,12 +2,12 @@ const rl = @import("raylib");
 const config = @import("config.zig").Config;
 const Bot = @import("bot.zig").Bot;
 const Cell = @import("formation.zig").Cell;
-const Mine = @import("mine.zig").Mine;
+const Chip = @import("chip.zig").Chip;
 const Player = @import("player.zig").Player;
 const Formations = @import("formation.zig").FORMATION;
 const AssetServer = @import("assetServer.zig").AssetServer;
 const Explosion = @import("animations.zig").ExplosionAnimation;
-const MineAnimation = @import("animations.zig").MineAnimation;
+const ChipAnimation = @import("animations.zig").ChipAnimation;
 const Jumper = @import("jumper.zig").Jumper;
 const JumperAnimation = @import("animations.zig").JumperAnimation;
 
@@ -21,7 +21,7 @@ pub const States = enum {
 pub const Game = struct {
     player: Player,
     bots: [config.MAX_BOT_COUNT]Bot = undefined,
-    mines: [config.MAX_MINE_COUNT]Mine = undefined,
+    chips: [config.MAX_CHIP_COUNT]Chip = undefined,
     jumper: Jumper,
     explosions: [config.MAX_EXPLOSION_COUNT]Explosion = undefined,
     activeBotCount: usize = 0,
@@ -39,7 +39,7 @@ pub const Game = struct {
             .player = undefined,
             .jumper = undefined,
             .bots = undefined,
-            .mines = undefined,
+            .chips = undefined,
             .explosions = undefined,
             .activeBotCount = 0,
             .state = .Initial,
@@ -55,7 +55,7 @@ pub const Game = struct {
         }
 
         try game.loadFormation();
-        try game.loadMines();
+        try game.loadChips();
         try game.loadJumper();
 
         return game;
@@ -84,14 +84,14 @@ pub const Game = struct {
         for (self.bots[0..]) |*bot| {
             bot.*.isActive = false;
         }
-        for (self.mines[0..]) |*m| {
-            m.*.isActive = false;
+        for (self.chips[0..]) |*c| {
+            c.*.isActive = false;
         }
         for (self.explosions[0..]) |*e| {
             e.*.isActive = false;
         }
         _ = try self.loadFormation();
-        _ = try self.loadMines();
+        _ = try self.loadChips();
         _ = try self.loadJumper();
     }
 
@@ -123,50 +123,50 @@ pub const Game = struct {
         self.activeBotCount = counter;
     }
 
-    fn loadMines(self: *@This()) !void {
-        for (self.mines[0..], 0..) |*m, index| {
-            m.*.animation = MineAnimation.init(self.assetServer);
-            m.*.size = rl.Vector2{
-                .x = config.MINE_WIDTH,
-                .y = config.MINE_HEIGHT,
+    fn loadChips(self: *@This()) !void {
+        for (self.chips[0..], 0..) |*c, index| {
+            c.*.animation = ChipAnimation.init(self.assetServer);
+            c.*.size = rl.Vector2{
+                .x = config.CHIP_WIDTH,
+                .y = config.CHIP_HEIGHT,
             };
 
             var validPosition = false;
             var attempts: usize = 0;
 
-            while (!validPosition and attempts < config.MINE_MAX_LOCATIONS_ATTEMPTS) {
-                const x = @as(f32, @floatFromInt(rl.getRandomValue(0, config.SCREEN_WIDTH - @as(i32, @intFromFloat(config.MINE_WIDTH * 2)))));
-                const y = @as(f32, @floatFromInt(rl.getRandomValue(@as(i32, @intFromFloat(config.MINE_HEIGHT * 2)), @as(i32, config.AREA_HEIGHT / 2))));
+            while (!validPosition and attempts < config.CHIP_MAX_LOCATIONS_ATTEMPTS) {
+                const x = @as(f32, @floatFromInt(rl.getRandomValue(0, config.SCREEN_WIDTH - @as(i32, @intFromFloat(config.CHIP_WIDTH * 2)))));
+                const y = @as(f32, @floatFromInt(rl.getRandomValue(@as(i32, @intFromFloat(config.CHIP_HEIGHT * 2)), @as(i32, config.AREA_HEIGHT / 2))));
 
                 validPosition = true;
-                for (self.mines[0..index]) |other| {
+                for (self.chips[0..index]) |other| {
                     const dx = x - other.position.x;
                     const dy = y - other.position.y;
                     const distance = @sqrt(dx * dx + dy * dy);
 
-                    if (distance < config.MINE_DISTANCE) {
+                    if (distance < config.CHIP_DISTANCE) {
                         validPosition = false;
                         break;
                     }
                 }
 
                 if (validPosition) {
-                    m.*.position = rl.Vector2{ .x = x, .y = y };
+                    c.*.position = rl.Vector2{ .x = x, .y = y };
                 }
 
                 attempts += 1;
             }
 
             if (!validPosition) {
-                m.*.position = rl.Vector2{
-                    .x = @floatFromInt(rl.getRandomValue(0, config.SCREEN_WIDTH - @as(i32, @intFromFloat(config.MINE_WIDTH * 2)))),
-                    .y = @floatFromInt(rl.getRandomValue(@as(i32, @intFromFloat(config.MINE_HEIGHT * 2)), @as(i32, config.AREA_HEIGHT / 2))),
+                c.*.position = rl.Vector2{
+                    .x = @floatFromInt(rl.getRandomValue(0, config.SCREEN_WIDTH - @as(i32, @intFromFloat(config.CHIP_WIDTH * 2)))),
+                    .y = @floatFromInt(rl.getRandomValue(@as(i32, @intFromFloat(config.CHIP_HEIGHT * 2)), @as(i32, config.AREA_HEIGHT / 2))),
                 };
             }
 
-            m.*.isActive = true;
-            m.*.animation.spawn(m.position.x, m.position.y);
-            m.*.maxLifetime = @floatFromInt(rl.getRandomValue(@as(i32, @intFromFloat(config.MINE_LIFETIME_RANGE[0])), @as(i32, @intFromFloat(config.MINE_LIFETIME_RANGE[1]))));
+            c.*.isActive = true;
+            c.*.animation.spawn(c.position.x, c.position.y);
+            c.*.maxLifetime = @floatFromInt(rl.getRandomValue(@as(i32, @intFromFloat(config.CHIP_LIFETIME_RANGE[0])), @as(i32, @intFromFloat(config.CHIP_LIFETIME_RANGE[1]))));
         }
     }
 

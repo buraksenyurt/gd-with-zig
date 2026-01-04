@@ -23,7 +23,7 @@ pub const ExplosionAnimation = struct {
         return .{
             .position = rl.Vector2{ .x = 0, .y = 0 },
             .isActive = false,
-            .spriteSheet = assetServer.explosionSheet,
+            .spriteSheet = assetServer.explosionAnimation,
         };
     }
 
@@ -73,7 +73,7 @@ pub const ExplosionAnimation = struct {
     }
 };
 
-pub const MineAnimation = struct {
+pub const ChipAnimation = struct {
     position: rl.Vector2,
     isActive: bool = false,
     currentFrame: usize = 0,
@@ -94,7 +94,7 @@ pub const MineAnimation = struct {
         return .{
             .position = rl.Vector2{ .x = 0, .y = 0 },
             .isActive = false,
-            .spriteSheet = assetServer.microControllerAnimation,
+            .spriteSheet = assetServer.chipAnimation,
         };
     }
 

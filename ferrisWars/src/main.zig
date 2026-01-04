@@ -113,9 +113,9 @@ pub fn main() !void {
                     }
                 }
 
-                for (game.mines[0..]) |*m| {
-                    if (m.isActive) {
-                        if (rl.checkCollisionRecs(game.player.getRectangle(), m.getRectangle())) {
+                for (game.chips[0..]) |*c| {
+                    if (c.isActive) {
+                        if (rl.checkCollisionRecs(game.player.getRectangle(), c.getRectangle())) {
                             game.state = .PlayerLoose;
                             continue :gameLoop;
                         }
@@ -145,9 +145,9 @@ pub fn main() !void {
                         b.draw();
                     }
                 }
-                for (game.mines[0..]) |*m| {
-                    m.update(deltaTime);
-                    m.draw();
+                for (game.chips[0..]) |*c| {
+                    c.update(deltaTime);
+                    c.draw();
                 }
 
                 for (game.explosions[0..]) |*e| {
