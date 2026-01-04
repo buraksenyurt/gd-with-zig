@@ -1,3 +1,4 @@
+const std = @import("std");
 const rl = @import("raylib");
 const config = @import("config.zig").Config;
 const Bot = @import("bot.zig").Bot;
@@ -10,6 +11,8 @@ const Explosion = @import("animations.zig").ExplosionAnimation;
 const ChipAnimation = @import("animations.zig").ChipAnimation;
 const Jumper = @import("jumper.zig").Jumper;
 const JumperAnimation = @import("animations.zig").JumperAnimation;
+const PlayerScore = @import("data.zig").PlayerScore;
+const Data = @import("data.zig");
 
 pub const States = enum {
     Initial,
@@ -26,7 +29,8 @@ pub const Game = struct {
     explosions: [config.MAX_EXPLOSION_COUNT]Explosion = undefined,
     activeBotCount: usize = 0,
     state: States = .Initial,
-    score: u32 = 0,
+    playerScores: [10]PlayerScore = undefined,
+    currentScore: u32 = 0,
     elapsedTime: f32 = 0.0,
     remainingBots: usize = 0,
     assetServer: AssetServer,
@@ -41,10 +45,11 @@ pub const Game = struct {
             .jumper = undefined,
             .bots = undefined,
             .chips = undefined,
+            .playerScores = undefined,
             .explosions = undefined,
             .activeBotCount = 0,
             .state = .Initial,
-            .score = 0,
+            .currentScore = 0,
             .remainingBots = 0,
             .elapsedTime = 0.0,
             .assetServer = undefined,
@@ -65,7 +70,7 @@ pub const Game = struct {
 
     pub fn reset(self: *@This()) !void {
         self.state = .Initial;
-        self.score = 0;
+        self.currentScore = 0;
         self.activeBotCount = 0;
         self.remainingBots = 0;
         self.player.bulletCooldown = 0.0;
@@ -191,4 +196,13 @@ pub const Game = struct {
             }
         }
     }
+
+    pub fn calculateScore(self: *@This()) u32 {
+        const timeBonusScore = @as(u32, @intFromFloat(self.elapsedTime * 10));
+        return timeBonusScore;
+    }
+
+    // pub fn saveCurrentScore(self: *@This(), playerId: u8) !void {
+
+    // }
 };

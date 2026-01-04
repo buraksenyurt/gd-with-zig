@@ -7,6 +7,8 @@ const AssetServer = @import("assetServer.zig").AssetServer;
 const TextBlock = @import("textBlock.zig").TextBlock;
 const TextAlignment = @import("textBlock.zig").TextAlignment;
 const Designer = @import("designer.zig");
+const PlayerScore = @import("data.zig").PlayerScore;
+const Data = @import("data.zig");
 
 pub fn main() !void {
     rl.setRandomSeed(@intCast(std.time.timestamp()));
@@ -24,6 +26,8 @@ pub fn main() !void {
     var game = try Game.init(
         assetServer,
     );
+    game.playerScores = try Data.loadPlayerScores();
+
     defer assetServer.unload();
 
     gameLoop: while (!rl.windowShouldClose()) {
@@ -48,7 +52,7 @@ pub fn main() !void {
         Designer.hudText.draw(
             .Left,
             .{
-                game.score,
+                game.currentScore,
                 game.remainingBots,
                 game.player.totalBulletsFired,
                 @as(i32, @intFromFloat(game.elapsedTime)),
@@ -83,7 +87,7 @@ pub fn main() !void {
                             if (rl.checkCollisionRecs(b.getRectangle(), bot.getRectangle())) {
                                 b.isActive = false;
                                 bot.isActive = false;
-                                game.score += 10;
+                                game.currentScore += 10;
                                 game.remainingBots -= 1;
 
                                 game.spawnExplosion(
@@ -167,7 +171,7 @@ pub fn main() !void {
             },
             .PlayerWin => {
                 rl.clearBackground(config.WIN_BACKGROUND_COLOR);
-                Designer.playerWinText.draw(TextAlignment.Center, .{});
+                Designer.playerWinText.draw(TextAlignment.Center, .{game.calculateScore()});
                 if (!rl.isSoundPlaying(assetServer.winningSound) and !game.winningSoundPlayed) {
                     rl.playSound(assetServer.winningSound);
                     game.winningSoundPlayed = true;
@@ -179,6 +183,9 @@ pub fn main() !void {
                     try game.reset();
                     continue :gameLoop;
                 }
+                const playerScore = PlayerScore.init(1, @intFromFloat(game.elapsedTime), game.calculateScore());
+                game.playerScores[0] = playerScore;
+                try Data.savePlayerScores(&game.playerScores);
             },
             .PlayerLoose => {
                 rl.clearBackground(config.LOOSE_BACKGROUND_COLOR);

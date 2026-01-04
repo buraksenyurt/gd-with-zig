@@ -17,7 +17,7 @@ pub const gameOverText = TextBlock{
 };
 
 pub const playerWinText = TextBlock{
-    .text = "You Win! Press R to Restart",
+    .text = "You Win with %d points.!\nPress R to Restart",
     .position = rl.Vector2{
         .x = HORIZONTAL_CENTER,
         .y = VERTICAL_CENTER - @as(f32, config.TITLE_FONT_SIZE * 2),
