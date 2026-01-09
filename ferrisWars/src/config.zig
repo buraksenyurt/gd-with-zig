@@ -2,7 +2,7 @@ const rl = @import("raylib");
 
 pub const Config = struct {
     // Game
-    pub const SCREEN_WIDTH: i32 = 600;
+    pub const SCREEN_WIDTH: i32 = 500;
     pub const SCREEN_HEIGHT: i32 = 800;
     pub const AREA_HEIGHT: i32 = 750;
     pub const FPS: i32 = 60;

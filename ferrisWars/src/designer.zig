@@ -1,5 +1,6 @@
 const TextBlock = @import("textBlock.zig").TextBlock;
 const TextAlignment = @import("textBlock.zig").TextAlignment;
+const Button = @import("button.zig").Button;
 const rl = @import("raylib");
 const config = @import("config.zig").Config;
 
@@ -35,3 +36,21 @@ pub const hudText = TextBlock{
     .fontSize = config.HUD_FONT_SIZE,
     .color = config.HUD_FONT_COLOR,
 };
+
+pub const StartGameButton = Button.init(
+    1,
+    rl.Vector2{
+        .x = 148.0,
+        .y = 584.0,
+    },
+    rl.Vector2{ .x = 210.0, .y = 50.0 },
+);
+
+pub const ConfigureButton = Button.init(
+    2,
+    rl.Vector2{
+        .x = 148.0,
+        .y = 642.0,
+    },
+    rl.Vector2{ .x = 210.0, .y = 50.0 },
+);

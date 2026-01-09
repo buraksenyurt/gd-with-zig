@@ -69,7 +69,7 @@ pub fn main() !void {
                     rl.Color.white,
                 );
 
-                if (rl.isKeyPressed(rl.KeyboardKey.enter) or rl.isMouseButtonPressed(rl.MouseButton.left)) {
+                if (rl.isKeyPressed(rl.KeyboardKey.enter) or Designer.StartGameButton.isClicked()) {
                     game.state = .Playing;
                 }
             },

@@ -25,7 +25,7 @@ pub const AssetServer = struct {
         assets.bots[2] = try rl.loadTexture("resources/assets/bot_3.png");
         assets.bullet = try rl.loadTexture("resources/assets/rocket.png");
         assets.botBullet = try rl.loadTexture("resources/assets/botBullet.png");
-        assets.cover = try rl.loadTexture("resources/assets/cover.png");
+        assets.cover = try rl.loadTexture("resources/assets/splash.png");
 
         // Sprite Sheets
         assets.explosionAnimation = try rl.loadTexture("resources/sheets/explosion.png");
