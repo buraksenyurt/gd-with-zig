@@ -8,6 +8,7 @@ pub const Config = struct {
     pub const FPS: i32 = 60;
     pub const TITLE_FONT_SIZE: i32 = 30;
     pub const HUD_FONT_SIZE: i32 = 20;
+    pub const CONFIGURATION_FONT_SIZE: i32 = 28;
 
     // Player
     pub const PLAYER_SPEED: f32 = 250.0;

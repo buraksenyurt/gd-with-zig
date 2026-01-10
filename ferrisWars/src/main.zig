@@ -36,7 +36,7 @@ pub fn main() !void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        if (!rl.isSoundPlaying(assetServer.levelMusic)) {
+        if (!rl.isSoundPlaying(assetServer.levelMusic) and game.music == .On) {
             rl.playSound(assetServer.levelMusic);
         }
 
@@ -71,6 +71,34 @@ pub fn main() !void {
 
                 if (rl.isKeyPressed(rl.KeyboardKey.enter) or Designer.StartGameButton.isClicked()) {
                     game.state = .Playing;
+                }
+
+                if (Designer.ConfigureButton.isClicked()) {
+                    game.state = .MenuConfigure;
+                }
+            },
+            .MenuConfigure => {
+                rl.clearBackground(config.BACKGROUND_COLOR);
+                Designer.configureView.draw(TextAlignment.Center, .{});
+
+                if (rl.isKeyPressed(rl.KeyboardKey.m)) {
+                    switch (game.music) {
+                        .On => game.music = .Off,
+                        .Off => game.music = .On,
+                    }
+                    game.setMusic();
+                }
+
+                // if (rl.isKeyPressed(rl.KeyboardKey.b)) {
+                //     switch (game.soundEffects) {
+                //         .On => game.soundEffects = .Off,
+                //         .Off => game.soundEffects = .On,
+                //     }
+                //     game.setSoundEffects();
+                // }
+
+                if (rl.isKeyPressed(rl.KeyboardKey.backspace)) {
+                    game.state = .Initial;
                 }
             },
             .Playing => {

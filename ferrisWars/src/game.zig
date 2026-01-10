@@ -16,9 +16,15 @@ const Data = @import("data.zig");
 
 pub const States = enum {
     Initial,
+    MenuConfigure,
     Playing,
     PlayerWin,
     PlayerLoose,
+};
+
+pub const SoundState = enum {
+    On,
+    Off,
 };
 
 pub const Game = struct {
@@ -36,6 +42,8 @@ pub const Game = struct {
     assetServer: AssetServer,
     winningSoundPlayed: bool = false,
     losingSoundPlayed: bool = false,
+    music: SoundState = .On,
+    soundEffects: SoundState = .On,
 
     pub fn init(
         assetServer: AssetServer,
@@ -206,5 +214,12 @@ pub const Game = struct {
         const accuracyBonus: f32 = @max(0.0, 500.0 - accuracyPenalty);
 
         return @as(u32, @intFromFloat(baseScore + timeBonus + accuracyBonus));
+    }
+
+    pub fn setMusic(self: *@This()) void {
+        switch (self.music) {
+            .On => rl.resumeSound(self.assetServer.levelMusic),
+            .Off => rl.pauseSound(self.assetServer.levelMusic),
+        }
     }
 };

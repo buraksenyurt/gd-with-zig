@@ -37,6 +37,34 @@ pub const hudText = TextBlock{
     .color = config.HUD_FONT_COLOR,
 };
 
+const configurationViewText =
+    \\  Configuration
+    \\
+    \\
+    \\
+    \\  Use the following keys 
+    \\  to configure the game:
+    \\
+    \\
+    \\  M - Toggle Music On/Off
+    \\  B - Toggle Sound Effects 
+    \\      On/Off
+    \\
+    \\
+    \\  Press `Backspace` to return 
+    \\  to the main menu.
+;
+
+pub const configureView = TextBlock{
+    .text = configurationViewText,
+    .position = rl.Vector2{
+        .x = HORIZONTAL_CENTER,
+        .y = VERTICAL_CENTER - @as(f32, config.CONFIGURATION_FONT_SIZE * 12),
+    },
+    .fontSize = config.CONFIGURATION_FONT_SIZE,
+    .color = rl.Color.black,
+};
+
 pub const StartGameButton = Button.init(
     1,
     rl.Vector2{
