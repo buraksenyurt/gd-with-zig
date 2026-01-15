@@ -11,6 +11,7 @@ pub const Player = struct {
     bulletCooldown: f32 = 0.0,
     totalBulletsFired: u32 = 0,
     assetServer: AssetServer,
+    soundEffectIsActive: bool = false,
 
     pub fn init(assetServer: AssetServer) @This() {
         var p: Player =
@@ -69,7 +70,7 @@ pub const Player = struct {
                     self.bulletCooldown = config.BULLET_COOLDOWN;
                     self.totalBulletsFired += 1;
 
-                    if (!rl.isSoundPlaying(self.assetServer.shootingSound)) {
+                    if (!rl.isSoundPlaying(self.assetServer.shootingSound) and self.soundEffectIsActive) {
                         rl.playSound(self.assetServer.shootingSound);
                     }
 

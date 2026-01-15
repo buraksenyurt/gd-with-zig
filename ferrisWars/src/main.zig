@@ -89,13 +89,13 @@ pub fn main() !void {
                     game.setMusic();
                 }
 
-                // if (rl.isKeyPressed(rl.KeyboardKey.b)) {
-                //     switch (game.soundEffects) {
-                //         .On => game.soundEffects = .Off,
-                //         .Off => game.soundEffects = .On,
-                //     }
-                //     game.setSoundEffects();
-                // }
+                if (rl.isKeyPressed(rl.KeyboardKey.b)) {
+                    switch (game.soundEffects) {
+                        .On => game.soundEffects = .Off,
+                        .Off => game.soundEffects = .On,
+                    }
+                    game.setSoundEffects();
+                }
 
                 if (rl.isKeyPressed(rl.KeyboardKey.backspace)) {
                     game.state = .Initial;
@@ -123,7 +123,7 @@ pub fn main() !void {
                                     bot.position.x + bot.size.x / 2 - 25,
                                     bot.position.y + bot.size.y / 2 - 25,
                                 );
-                                rl.playSound(assetServer.explosionSound);
+                                if (game.soundEffects == .On) rl.playSound(assetServer.explosionSound);
                             }
                         }
                     }

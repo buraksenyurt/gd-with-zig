@@ -222,4 +222,11 @@ pub const Game = struct {
             .Off => rl.pauseSound(self.assetServer.levelMusic),
         }
     }
+
+    pub fn setSoundEffects(self: *@This()) void {
+        switch (self.soundEffects) {
+            .On => self.player.soundEffectIsActive = true,
+            .Off => self.player.soundEffectIsActive = false,
+        }
+    }
 };
